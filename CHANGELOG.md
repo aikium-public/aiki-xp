@@ -88,15 +88,8 @@ data and model weights on Zenodo, code on GitHub, and interactive demo on Modal.
   - Tier B (+ HyenaDNA + classical): ρ_overall = 0.5929, ρ_non-mega = 0.5312.
   - Tier B+ (+ Evo-2 7B init-window): ρ_overall = 0.6035, ρ_non-mega = 0.5428.
   - Tier C (+ Evo-2 7B full operon): ρ_overall = 0.6501, ρ_non-mega = 0.5747.
-  - Tier D (+ Bacformer-large + operon structure, 9 modalities): ρ_overall = 0.6675, ρ_non-mega = 0.5904.
+  - Tier D (+ Bacformer-large + operon structure, 5 modalities — XP5 champion): ρ_overall = 0.6675, ρ_non-mega = 0.5904.
 - **Training corpus:** 492,026 genes · 385 species · 1,831 bacterial reference genomes.
-
-### Upcoming (see ROADMAP.md)
-- Python SDK `aikixp-client` on PyPI.
-- Precompute of Tier D predictions for all 4,566 cached genomes.
-- Nearest-neighbour similarity search in the 492K corpus.
-- Per-prediction modality attribution.
-- Multi-record WGS/draft-assembly support (currently single-SeqRecord only).
 
 ---
 
