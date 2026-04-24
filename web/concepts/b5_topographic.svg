@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <radialGradient id="top5glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"  stop-color="#C9A961" stop-opacity="0.2"/>
+      <stop offset="80%" stop-color="#C9A961" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" fill="#0F0F0F"/>
+  <circle cx="200" cy="200" r="180" fill="url(#top5glow)"/>
+  <!-- Concentric nested closed curves, each slightly different shape.
+       Tiers: outermost = A, innermost = D. -->
+  <g fill="none" stroke="#C9A961" stroke-linejoin="round">
+    <!-- Tier A ring (outermost, thinnest) -->
+    <path d="M 100 200 C 100 130, 160 90, 200 90 C 260 90, 310 130, 310 200 C 310 260, 260 310, 200 310 C 140 310, 100 270, 100 200 Z"
+          stroke-width="1" opacity="0.5"/>
+    <!-- Tier B -->
+    <path d="M 125 200 C 125 145, 165 110, 205 110 C 255 110, 290 145, 285 200 C 285 245, 255 285, 200 285 C 150 285, 125 250, 125 200 Z"
+          stroke-width="1.2" opacity="0.6"/>
+    <!-- Tier B+ -->
+    <path d="M 150 200 C 150 160, 175 130, 210 132 C 248 135, 268 160, 265 200 C 265 235, 235 260, 202 260 C 168 260, 150 232, 150 200 Z"
+          stroke-width="1.4" opacity="0.7"/>
+    <!-- Tier C -->
+    <path d="M 172 200 C 172 175, 190 155, 213 158 C 238 160, 250 178, 248 200 C 248 222, 228 240, 208 240 C 186 240, 172 222, 172 200 Z"
+          stroke-width="1.6" opacity="0.85"/>
+    <!-- Tier D innermost, brightest -->
+    <path d="M 188 200 C 188 188, 198 178, 210 180 C 226 182, 232 190, 230 202 C 228 215, 218 224, 208 222 C 195 220, 188 212, 188 200 Z"
+          stroke-width="2.2" opacity="1"/>
+  </g>
+  <!-- Tiny ledger dots on each ring to label "A B B+ C D" -->
+  <g fill="#C9A961">
+    <circle cx="100" cy="200" r="2.5"/>
+    <circle cx="125" cy="200" r="2.5"/>
+    <circle cx="150" cy="200" r="2.5"/>
+    <circle cx="172" cy="200" r="2.5"/>
+    <circle cx="188" cy="200" r="3"/>
+  </g>
+  <g font-family="JetBrains Mono, monospace" font-size="9" fill="#D4C5A0" text-anchor="middle">
+    <text x="100" y="188">A</text>
+    <text x="125" y="188">B</text>
+    <text x="150" y="188">B+</text>
+    <text x="172" y="188">C</text>
+    <text x="188" y="188">D</text>
+  </g>
+  <!-- Wordmark -->
+  <text x="200" y="378" text-anchor="middle"
+        font-family="Playfair Display, Georgia, serif"
+        font-size="32" font-weight="700" fill="#FAFAF8">Aiki</text>
+</svg>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Aiki suite — logo concept gallery</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:wght@400;500;600;700;800;900&family=Noto+Serif+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0F0F0F;
+    color: #FAFAF8;
+    font-family: Inter, -apple-system, sans-serif;
+    padding: 40px 32px 60px;
+    line-height: 1.6;
+  }
+  .container { max-width: 1400px; margin: 0 auto; }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    background: linear-gradient(135deg, #FAFAF8, #D4C5A0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+  .lede {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: #B88A61;
+    max-width: 820px;
+    margin-bottom: 8px;
+  }
+  .hint {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: #6A6A6A;
+    margin-bottom: 44px;
+  }
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: #D4C5A0;
+    margin: 56px 0 8px;
+    padding-bottom: 10px;
+    position: relative;
+  }
+  h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 50px; height: 2.5px;
+    background: linear-gradient(90deg, #C9A961, #A67C2B);
+    border-radius: 2px;
+  }
+  .set-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: #B88A61;
+    margin-bottom: 24px;
+    max-width: 820px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+  .card {
+    background: rgba(20,20,20,0.7);
+    border: 1px solid rgba(201,169,97,0.18);
+    border-radius: 16px;
+    padding: 20px;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .card:hover {
+    border-color: rgba(201,169,97,0.55);
+    transform: translateY(-3px);
+  }
+  .card img, .card object {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    background: #0F0F0F;
+    display: block;
+  }
+  .card .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: #C9A961;
+    background: rgba(201,169,97,0.08);
+    padding: 2px 8px;
+    border-radius: 6px;
+    margin-top: 14px;
+    margin-bottom: 4px;
+  }
+  .card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    color: #FAFAF8;
+    margin-bottom: 6px;
+  }
+  .card p {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    color: #B0B0B0;
+    line-height: 1.55;
+  }
+  .caveat {
+    background: rgba(124,29,29,0.12);
+    border-left: 3px solid #7C1D1D;
+    padding: 14px 20px;
+    border-radius: 8px;
+    margin: 36px 0;
+    color: #FCA5A5;
+    font-size: 0.9rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  a { color: #C9A961; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Aiki suite — logo concepts</h1>
+  <p class="lede">Ten concept directions. Set A stays inside the Aikium brand (gold + charcoal + flame + Playfair). Set B departs, informed by the competitor landscape (Chai, Boltz, DeepMind, Xaira, Nabla, Peptone).</p>
+  <p class="hint">Each card is a working SVG — right-click → Save Image As → drop into Figma / hand to a designer. Illustrative concepts that need raster rendering (B2 calligraphy, B3 kintsugi texture) have prompts in <code>prompts.md</code> for Midjourney / DALL-E / Imagen.</p>
+
+  <div class="caveat">
+    <strong>Concept, not final art.</strong> The SVGs below are directional — geometry and type rendering will need a designer's hand before final use. The ideogram in B2 requires a Noto Serif JP / CJK font to render the 合 character cleanly.
+  </div>
+
+  <h2>Set A — within Aikium's brand</h2>
+  <p class="set-sub">Gold gradient, deep charcoal, Playfair Display wordmark, silent flame pulse. Evolution of the current logo system, not a pivot.</p>
+  <div class="grid">
+    <div class="card">
+      <img src="a1_enso.svg" alt="A1 Enso">
+      <div class="tag">A1 · within brand</div>
+      <h3>Enso wordmark</h3>
+      <p>Single brushstroke ring (zen enso, in the same spirit as "aiki" means harmony). Open gap invites per-tool suffixes (-XP, -Fold, -Bind).</p>
+    </div>
+    <div class="card">
+      <img src="a2_braid.svg" alt="A2 Braid">
+      <div class="tag">A2 · within brand</div>
+      <h3>Three-filament braid</h3>
+      <p>Protein / nucleic-acid / genome filaments twist into the wordmark. Literalizes "multimodal fusion." Per-tool, one filament glows brighter.</p>
+    </div>
+    <div class="card">
+      <img src="a3_flame_residues.svg" alt="A3 Flame">
+      <div class="tag">A3 · within brand</div>
+      <h3>Flame of residues</h3>
+      <p>The dashboard's pulsing flame reborn as a teardrop whose indented profile suggests amino-acid side chains. Direct lineage from current UI.</p>
+    </div>
+    <div class="card">
+      <img src="a4_helix_a.svg" alt="A4 Helix-A">
+      <div class="tag">A4 · within brand</div>
+      <h3>Helix-A</h3>
+      <p>The "A" of Aiki as a simplified α-helix. Immediate "protein AI" read. Readable at favicon size. Most on-the-nose of Set A — useful for cold visitors.</p>
+    </div>
+    <div class="card">
+      <img src="a5_periodic_tile.svg" alt="A5 Periodic tile">
+      <div class="tag">A5 · within brand</div>
+      <h3>Periodic-table tile</h3>
+      <p>Hexagonal element-like cell containing the wordmark. Supports infinite suite expansion: each tool = new tile variant with its own subscript.</p>
+    </div>
+  </div>
+
+  <h2>Set B — fresh thinking, after competitor survey</h2>
+  <p class="set-sub">Competitor territory: blue/white minimalism (Chai, Peptone, Xaira), abstract geometric marks (DeepMind), clean sans-serif logotypes. Under-used: warm palettes, craft motifs, non-Western references, distinctive typography. These five lean into those gaps.</p>
+  <div class="grid">
+    <div class="card">
+      <img src="b1_cli.svg" alt="B1 CLI">
+      <div class="tag">B1 · fresh</div>
+      <h3>&lt;Aiki/&gt; — the CLI mark</h3>
+      <p>Terminal-window aesthetic. Tells bioinformaticians "we ship code, not slideware." Zero overlap with any polished Silicon-Valley competitor.</p>
+    </div>
+    <div class="card">
+      <img src="b2_ideogram.svg" alt="B2 Ideogram">
+      <div class="tag">B2 · fresh</div>
+      <h3>合 — harmony ideogram</h3>
+      <p>Single Japanese kanji (合, "union / harmony") in a single bold gold stroke. Honors the Aiki etymology. No Western bio-AI brand has ideographic identity.</p>
+    </div>
+    <div class="card">
+      <img src="b3_kintsugi.svg" alt="B3 Kintsugi">
+      <div class="tag">B3 · fresh</div>
+      <h3>Kintsugi glyph</h3>
+      <p>Gold-veined repair pattern on an obsidian disc. Narrative: fragmented bio-databases, Aikium stitches the seams. Brand-consistent, story-rich, unused.</p>
+    </div>
+    <div class="card">
+      <img src="b4_constellation.svg" alt="B4 Constellation">
+      <div class="tag">B4 · fresh</div>
+      <h3>Constellation</h3>
+      <p>Sparse graph of luminous nodes. Simultaneously suggests molecular bonds, neural networks, star charts. Each node can light up per-tool.</p>
+    </div>
+    <div class="card">
+      <img src="b5_topographic.svg" alt="B5 Topographic">
+      <div class="tag">B5 · fresh</div>
+      <h3>Topographic contours</h3>
+      <p>Concentric rings mapping to the paper's deployment ladder (A→B→B+→C→D). The logo <em>is</em> the science's central argument.</p>
+    </div>
+  </div>
+
+  <h2 style="margin-top:64px;">Shortlist recommendation</h2>
+  <p class="set-sub">If I had to pick two to push to a designer: <strong>A1 (Enso)</strong> and <strong>B3 (Kintsugi)</strong>. Both uniquely Aikium, both carry a story out loud, stylistic cousins — one family, two executions.</p>
+
+  <p class="hint" style="margin-top:44px;">For higher-fidelity renders of the illustrative concepts (A3 flame, B2 brushstroke kanji, B3 kintsugi texture), see <a href="prompts.md">prompts.md</a> — Midjourney / DALL-E / Imagen prompts with brand-specific keywords.</p>
+</div>
+</body>
+</html>

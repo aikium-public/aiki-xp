@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Live demo
+    url: https://aikium--aikixp-tier-a-landing-page.modal.run
+    about: Try Aiki-XP in the browser, no install required.
+  - name: Colab quickstart
+    url: https://colab.research.google.com/github/aikium-public/aiki-xp/blob/main/notebooks/aiki_xp_colab_quickstart.ipynb
+    about: Reproduce the paper's headline numbers in a notebook, no local install.
+  - name: Paper preprint (Zenodo)
+    url: https://doi.org/10.5281/zenodo.19639621
+    about: Full paper + 28 GB data + weights archive.
+  - name: Troubleshooting & FAQ
+    url: https://github.com/aikium-public/aiki-xp#troubleshooting--faq
+    about: Cold-start timing, tagged sequences, per-point uncertainty, and more.

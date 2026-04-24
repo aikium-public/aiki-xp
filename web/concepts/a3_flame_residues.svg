@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="f3" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%"   stop-color="#A67C2B"/>
+      <stop offset="40%"  stop-color="#C9A961"/>
+      <stop offset="100%" stop-color="#F3E6B8"/>
+    </linearGradient>
+    <radialGradient id="f3glow" cx="50%" cy="55%" r="45%">
+      <stop offset="0%"  stop-color="#C9A961" stop-opacity="0.35"/>
+      <stop offset="80%" stop-color="#C9A961" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="f3soft"><feGaussianBlur stdDeviation="1.5"/></filter>
+  </defs>
+  <rect width="400" height="400" fill="#0F0F0F"/>
+  <circle cx="200" cy="200" r="160" fill="url(#f3glow)"/>
+  <!-- Flame body: teardrop silhouette with indented profile like side chains. -->
+  <path d="M 200 80
+           C 168 120, 148 150, 160 185
+           C 172 205, 152 220, 168 240
+           C 180 255, 152 270, 172 285
+           C 188 295, 168 305, 186 315
+           C 200 322, 214 315, 228 305
+           C 212 295, 232 285, 244 270
+           C 256 255, 232 240, 244 225
+           C 256 210, 232 192, 244 175
+           C 256 150, 232 120, 200 80 Z"
+        fill="url(#f3)" filter="url(#f3soft)" opacity="0.95"/>
+  <!-- Inner highlight -->
+  <path d="M 200 130
+           C 190 150, 180 175, 192 200
+           C 200 220, 200 245, 200 280"
+        fill="none" stroke="#FAFAF8" stroke-opacity="0.35"
+        stroke-width="2" stroke-linecap="round"/>
+  <!-- Base pedestal (wordmark) -->
+  <text x="200" y="365" text-anchor="middle"
+        font-family="Playfair Display, Georgia, serif"
+        font-size="40" font-weight="700" fill="#FAFAF8">Aiki</text>
+  <text x="200" y="388" text-anchor="middle"
+        font-family="Inter, sans-serif" font-size="9"
+        fill="#D4C5A0" letter-spacing="0.32em"
+        text-transform="uppercase">AIKIUM</text>
+</svg>

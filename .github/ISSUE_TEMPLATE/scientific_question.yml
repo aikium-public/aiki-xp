@@ -1,0 +1,39 @@
+name: Scientific question
+description: Question about the model, training, benchmarks, or an interpretation of a result.
+labels: ["question", "science"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Scientific questions we're especially interested in: failure modes we haven't characterized,
+        unexpected behavior on novel phyla, suggestions for extensions, or requests to compare against
+        a new baseline. Please cite papers where helpful.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      description: Be specific. "Does Aiki-XP handle X" is more useful than "How does Aiki-XP work."
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context (use case, hypothesis, or what you've already tried)
+      description: >
+        The more we know about your use case (e.g. "I'm designing a recombinant library for
+        *B. subtilis*" or "I want to compare Aiki-XP to Hwang 2025 on my dataset"), the more
+        usefully we can answer.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checked
+    attributes:
+      label: I've checked
+      options:
+        - label: The README & FAQ
+          required: true
+        - label: The paper's Methods and §4 (Limitations)
+          required: false

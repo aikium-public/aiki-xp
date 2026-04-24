@@ -1,0 +1,9 @@
+.git
+data/*.parquet
+data/*.csv
+zenodo_staging/
+checkpoints/*.pt
+figures/
+__pycache__
+*.pyc
+*.egg-info

@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling>=1.18"]
+build-backend = "hatchling.build"
+
+[project]
+name = "aikixp-client"
+version = "1.0.0"
+description = "Official Python client for the Aiki-XP bacterial protein-expression prediction API (Aikium, Inc.)."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Aikium", email = "venkatesh@aikium.com" }]
+keywords = [
+    "aiki-xp",
+    "aikium",
+    "protein",
+    "expression",
+    "bacterial",
+    "bioinformatics",
+    "machine-learning",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+dependencies = ["requests>=2.25"]
+
+[project.optional-dependencies]
+test = ["pytest>=7.0"]
+
+[project.urls]
+Homepage = "https://github.com/aikium-public/aiki-xp"
+Repository = "https://github.com/aikium-public/aiki-xp"
+Documentation = "https://github.com/aikium-public/aiki-xp#readme"
+Paper = "https://doi.org/10.5281/zenodo.19639621"
+"Live demo" = "https://aikium--aikixp-tier-a-landing-page.modal.run"
+"Issue tracker" = "https://github.com/aikium-public/aiki-xp/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["aikixp_client"]

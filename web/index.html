@@ -1,0 +1,3814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aiki-XP — Bacterial Protein Expression Prediction | Aikium</title>
+<meta name="description" content="Aiki-XP ranks within-species relative protein expression across 492,026 bacterial genes from 385 species. From Aikium, Inc.">
+
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://aikium--aikixp-tier-a-landing-page.modal.run/">
+<meta property="og:title" content="Aiki-XP — multimodal prediction of bacterial protein expression">
+<meta property="og:description" content="Leakage-controlled prediction across 492,026 genes from 385 bacterial species. Spearman ρ_nc = 0.592 on non-conserved genes. Paper, data, weights, and a live demo — all public.">
+<meta property="og:image" content="https://aikium--aikixp-tier-a-landing-page.modal.run/og_image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Aikium">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Aiki-XP — multimodal prediction of bacterial protein expression">
+<meta name="twitter:description" content="Leakage-controlled prediction across 492,026 genes from 385 bacterial species. Spearman ρ_nc = 0.592 on non-conserved genes.">
+<meta name="twitter:image" content="https://aikium--aikixp-tier-a-landing-page.modal.run/og_image.png">
+<link rel="canonical" href="https://aikium--aikixp-tier-a-landing-page.modal.run/">
+<meta name="author" content="Aikium, Inc.">
+<meta name="robots" content="index, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.26.0/plotly.min.js"></script>
+<script src="https://3Dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+:root {
+  --primary-gold: #C9A961;
+  --rich-gold: #B8932F;
+  --deep-gold: #A67C2B;
+  --champagne: #D4C5A0;
+  --rose-gold: #B88A61;
+  --deep-charcoal: #0F0F0F;
+  --charcoal: #1A1A1A;
+  --soft-charcoal: #2A2A2A;
+  --warm-grey: #3A3A3A;
+  --dove-grey: #6A6A6A;
+  --sapphire: #1E4A8A;
+  --emerald: #065F46;
+  --burgundy: #7C1D1D;
+  --pearl: #FAFAF8;
+  --ivory: #F5F5F3;
+  --alabaster: #E8E8E6;
+  --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-elevated: 0 10px 40px rgba(201, 169, 97, 0.12), 0 3px 8px rgba(0, 0, 0, 0.18);
+  --shadow-luxury: 0 20px 60px rgba(201, 169, 97, 0.15), 0 5px 15px rgba(0, 0, 0, 0.25);
+  --glow-gold: 0 0 20px rgba(201, 169, 97, 0.3), 0 0 40px rgba(201, 169, 97, 0.15);
+  --gradient-gold: linear-gradient(135deg, #C9A961 0%, #B8932F 50%, #A67C2B 100%);
+  --gradient-dark: linear-gradient(160deg, #0F0F0F 0%, #1A1A1A 40%, #2A2A2A 100%);
+  --shimmer: linear-gradient(110deg, transparent 40%, rgba(201, 169, 97, 0.08) 50%, transparent 60%);
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--gradient-dark);
+  color: var(--pearl);
+  min-height: 100vh;
+  line-height: 1.7;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+}
+.container { max-width: 1240px; margin: 0 auto; padding: 0 32px; }
+h1, h2, h3, h4 {
+  font-family: 'Playfair Display', 'Cormorant Garamond', serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+/* =================== HERO =================== */
+.hero {
+  position: relative;
+  border: 1px solid rgba(201, 169, 97, 0.25);
+  border-radius: 18px;
+  padding: 18px 32px 20px;
+  margin: 14px 0 16px;
+  box-shadow: var(--shadow-luxury);
+  background: linear-gradient(180deg, rgba(6,8,10,0.95), rgba(12,14,16,0.95));
+  text-align: center;
+  backdrop-filter: blur(20px);
+  overflow: hidden;
+}
+/* Gold-halo border (double border via pseudo-element + mask) */
+.hero::after, .viz-container::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: var(--gradient-gold);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.5;
+}
+/* Logo: outline only (no gold fill), with subtle flame-pulse halo */
+.logo-box {
+  position: relative;
+  width: 56px; height: 56px;
+  margin: 0 auto 8px;
+  border-radius: 12px;
+  background: transparent;
+  border: 1.5px solid rgba(201, 169, 97, 0.55);
+  display: flex; align-items: center; justify-content: center;
+}
+.logo-box::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 18px;
+  background: radial-gradient(circle at 50% 50%, rgba(201, 169, 97, 0.28) 0%, transparent 70%);
+  animation: flamePulse 3.6s ease-in-out infinite;
+  z-index: -1;
+  pointer-events: none;
+}
+@keyframes flamePulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.96); }
+  50%      { opacity: 0.82; transform: scale(1.04); }
+}
+.logo-box img {
+  width: 82%; height: 82%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,0.4));
+}
+.hero-eyebrow {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--champagne);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  margin-bottom: 4px;
+  font-family: 'Inter', sans-serif;
+}
+.hero h1 {
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  margin-bottom: 6px;
+  background: linear-gradient(135deg, var(--pearl) 0%, var(--champagne) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.tagline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  color: var(--alabaster);
+  max-width: 780px;
+  margin: 0 auto 8px;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.4;
+}
+.hero-inline-stats {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  justify-content: center;
+  padding: 6px 16px;
+  background: rgba(201, 169, 97, 0.06);
+  border: 1px solid rgba(201, 169, 97, 0.16);
+  border-radius: 8px;
+  margin-top: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem;
+  color: var(--champagne);
+}
+.hero-inline-stats strong { color: var(--pearl); font-weight: 600; }
+
+/* =================== METRICS =================== */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin: 32px 0 44px;
+}
+.metric {
+  position: relative;
+  background: linear-gradient(145deg, rgba(26,26,26,0.95) 0%, rgba(42,42,42,0.85) 100%);
+  border: 1px solid rgba(201, 169, 97, 0.2);
+  border-radius: 18px;
+  padding: 28px 22px;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  opacity: 0;
+  animation: fadeUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.metric:nth-child(1) { animation-delay: 0.05s; }
+.metric:nth-child(2) { animation-delay: 0.12s; }
+.metric:nth-child(3) { animation-delay: 0.19s; }
+.metric:nth-child(4) { animation-delay: 0.26s; }
+.metric::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--gradient-gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.metric:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-elevated);
+  border-color: var(--primary-gold);
+}
+.metric:hover::before { transform: scaleX(1); }
+.metric-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.3rem;
+  font-weight: 800;
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+.metric-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--champagne);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.metric-desc {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  color: var(--rose-gold);
+  margin-top: 8px;
+  font-style: italic;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* =================== HOW IT WORKS (3 STEPS) =================== */
+.how-section { margin: 48px 0; }
+.limitations-panel { margin: 48px 0; }
+.limits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+.limit-card {
+  padding: 20px;
+  border-radius: 12px;
+  background: rgba(26, 26, 26, 0.4);
+  border: 1px solid rgba(201, 169, 97, 0.15);
+}
+.limit-card ul { margin: 8px 0 0 0; padding-left: 20px; }
+.limit-card li { font-size: 0.88rem; color: var(--pearl); opacity: 0.9; margin-bottom: 8px; line-height: 1.5; }
+.limit-card code { background: rgba(201, 169, 97, 0.08); padding: 1px 5px; border-radius: 3px; font-size: 0.82rem; }
+.limit-head {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: var(--champagne);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.limit-works .limit-head { color: #7FC99B; }
+.limit-caution .limit-head { color: var(--primary-gold); }
+.limit-no .limit-head { color: #D48888; }
+.limits-footer {
+  margin-top: 20px;
+  font-size: 0.85rem;
+  color: var(--champagne);
+  opacity: 0.75;
+  font-style: italic;
+}
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  color: var(--pearl);
+  margin-bottom: 8px;
+  position: relative;
+  padding-bottom: 14px;
+}
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 60px; height: 3px;
+  background: var(--gradient-gold);
+  border-radius: 2px;
+}
+.section-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  color: var(--rose-gold);
+  margin-bottom: 28px;
+  max-width: 760px;
+  font-style: italic;
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+.step {
+  position: relative;
+  padding: 26px 22px 22px;
+  background: rgba(26,26,26,0.6);
+  border: 1px solid rgba(201, 169, 97, 0.15);
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+}
+.step-num {
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--gradient-gold);
+  color: var(--deep-charcoal);
+  font-family: 'Playfair Display', serif;
+  font-weight: 800;
+  font-size: 1.1rem;
+  margin-bottom: 14px;
+}
+.step h3 {
+  font-size: 1.15rem;
+  color: var(--pearl);
+  margin-bottom: 8px;
+}
+.step p {
+  font-size: 0.95rem;
+  color: var(--alabaster);
+  line-height: 1.6;
+}
+
+/* =================== FRAMING =================== */
+.framing {
+  background: linear-gradient(145deg, rgba(26,26,26,0.6), rgba(26,26,26,0.3));
+  border-left: 3px solid var(--primary-gold);
+  border-radius: 8px;
+  padding: 22px 26px;
+  margin: 32px 0 20px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  color: var(--alabaster);
+  line-height: 1.6;
+}
+.framing strong {
+  color: var(--primary-gold);
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+}
+
+/* =================== FORM PANEL =================== */
+.panel {
+  position: relative;
+  background: linear-gradient(145deg, rgba(26,26,26,0.95), rgba(42,42,42,0.85));
+  border: 1px solid rgba(201, 169, 97, 0.2);
+  border-radius: 20px;
+  padding: 40px;
+  margin: 28px 0;
+  box-shadow: var(--shadow-elevated);
+  backdrop-filter: blur(10px);
+}
+.panel h2 {
+  font-size: 1.8rem;
+  color: var(--pearl);
+  margin-bottom: 4px;
+  padding-bottom: 14px;
+  position: relative;
+}
+.panel h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 60px; height: 3px;
+  background: var(--gradient-gold);
+  border-radius: 2px;
+}
+.panel-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  color: var(--rose-gold);
+  margin-bottom: 24px;
+  font-style: italic;
+}
+.example-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  align-items: center;
+}
+.example-row .example-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--dove-grey);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-right: 6px;
+}
+.example-btn {
+  padding: 8px 16px;
+  background: rgba(201, 169, 97, 0.08);
+  border: 1px solid rgba(201, 169, 97, 0.25);
+  border-radius: 8px;
+  color: var(--champagne);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.example-btn:hover {
+  background: rgba(201, 169, 97, 0.18);
+  border-color: var(--primary-gold);
+  color: var(--pearl);
+  transform: translateY(-1px);
+}
+.sticky-header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 20px;
+  background: rgba(15, 15, 15, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(201, 169, 97, 0.18);
+}
+.sticky-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+.sticky-logo { width: 28px; height: 28px; border-radius: 4px; }
+.sticky-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  color: var(--primary-gold);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.sticky-sub {
+  font-size: 0.78rem;
+  color: var(--champagne);
+  opacity: 0.72;
+  letter-spacing: 0.04em;
+}
+.sticky-action {
+  padding: 5px 14px;
+  border: 1px solid rgba(201, 169, 97, 0.4);
+  border-radius: 14px;
+  color: var(--champagne);
+  text-decoration: none;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+}
+.sticky-action:hover {
+  background: rgba(201, 169, 97, 0.12);
+  border-color: var(--primary-gold);
+  color: var(--pearl);
+}
+@media (max-width: 600px) {
+  .sticky-sub { display: none; }
+}
+.compute-footnote {
+  font-size: 0.8rem;
+  color: var(--champagne);
+  opacity: 0.75;
+  line-height: 1.6;
+  margin: 28px auto;
+  max-width: 760px;
+  padding: 10px 14px;
+  border-left: 2px solid rgba(201, 169, 97, 0.3);
+}
+.compute-footnote strong { color: var(--primary-gold); opacity: 1; }
+.stale-results-warn {
+  grid-column: 1 / -1;
+  margin-top: 6px;
+  padding: 9px 14px;
+  background: rgba(212, 165, 116, 0.1);
+  border: 1px solid rgba(212, 165, 116, 0.35);
+  border-left: 3px solid #D4A574;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  color: var(--pearl);
+  line-height: 1.5;
+}
+.results-stale .viz-container,
+.results-stale #results { opacity: 0.45; transition: opacity 0.15s; }
+.dissect-expander {
+  padding: 18px 22px;
+  border-radius: 12px;
+  background: rgba(26, 26, 26, 0.45);
+  border: 1px solid rgba(201, 169, 97, 0.18);
+}
+.dissect-expander summary {
+  cursor: pointer;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: var(--champagne);
+  font-weight: 500;
+  list-style: none;
+  user-select: none;
+}
+.dissect-expander summary::-webkit-details-marker { display: none; }
+.dissect-expander summary::before {
+  content: '▸ ';
+  color: var(--primary-gold);
+  display: inline-block;
+  margin-right: 6px;
+  transition: transform 0.2s;
+}
+.dissect-expander[open] summary::before { transform: rotate(90deg); }
+.dissect-expander[open] summary { margin-bottom: 12px; }
+.dissect-inner { display: flex; flex-direction: column; gap: 16px; }
+.dissect-block {
+  border-top: 1px dashed rgba(201,169,97,0.15);
+  padding-top: 12px;
+}
+.dissect-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--primary-gold);
+  margin-bottom: 8px;
+}
+.dissect-row {
+  font-size: 0.9rem;
+  color: var(--pearl);
+  line-height: 1.55;
+  margin-bottom: 6px;
+}
+.dissect-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+.dissect-table td { padding: 5px 8px; border-bottom: 1px solid rgba(201,169,97,0.06); color: var(--pearl); }
+.dissect-table td:first-child { color: var(--champagne); width: 42%; }
+.dissect-table td.ood { color: #E8732D; font-weight: 600; }
+.dissect-footer {
+  margin: 10px 0 0;
+  font-size: 0.78rem;
+  color: var(--champagne);
+  opacity: 0.7;
+  font-style: italic;
+}
+.reliability-bucket {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-right: 8px;
+}
+.reliability-very-high { background: rgba(46,158,224,0.2); color: #6BC0EE; }
+.reliability-high      { background: rgba(127,201,155,0.2); color: #7FC99B; }
+.reliability-medium    { background: rgba(201,169,97,0.2); color: var(--primary-gold); }
+.reliability-low       { background: rgba(232,193,77,0.2); color: #E8C14D; }
+.reliability-unreliable{ background: rgba(232,115,45,0.2); color: #E8732D; }
+.structure-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+.structure-status {
+  font-size: 0.84rem;
+  color: var(--champagne);
+  opacity: 0.85;
+}
+.umap-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0;
+  flex-wrap: wrap;
+}
+.umap-controls label {
+  font-size: 0.82rem;
+  color: var(--champagne);
+  letter-spacing: 0.05em;
+}
+.umap-controls select {
+  background: rgba(26, 26, 26, 0.85);
+  color: var(--pearl);
+  border: 1px solid rgba(201, 169, 97, 0.3);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.88rem;
+  font-family: 'Inter', sans-serif;
+}
+.umap-controls select:focus { border-color: var(--primary-gold); outline: none; }
+.umap-status {
+  font-size: 0.82rem;
+  color: var(--champagne);
+  opacity: 0.75;
+}
+.share-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.share-hint {
+  font-size: 0.78rem;
+  color: var(--champagne);
+  opacity: 0.75;
+}
+.share-toast {
+  font-size: 0.82rem;
+  color: var(--primary-gold);
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.share-toast.visible { opacity: 1; }
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+.form-field label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--champagne);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+.info {
+  position: relative;
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  width: 18px; height: 18px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: rgba(201, 169, 97, 0.18);
+  color: var(--champagne);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: help;
+  text-transform: none;
+  letter-spacing: 0;
+  vertical-align: middle;
+  user-select: none;
+  transition: background 0.2s;
+}
+.info:hover { background: rgba(201, 169, 97, 0.3); }
+.info::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 260px;
+  max-width: 340px;
+  padding: 12px 14px;
+  background: rgba(16,16,16,0.98);
+  border: 1px solid rgba(201, 169, 97, 0.35);
+  border-radius: 10px;
+  color: var(--alabaster);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: normal;
+  box-shadow: var(--shadow-elevated);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 50;
+}
+.info:hover::after, .info.active::after, .info:focus::after { opacity: 1; }
+.info:focus { outline: 2px solid var(--primary-gold); outline-offset: 2px; }
+.form-field textarea,
+.form-field input[type=text],
+.form-field select {
+  width: 100%;
+  padding: 14px 18px;
+  background: rgba(10,10,10,0.6);
+  border: 1px solid rgba(201, 169, 97, 0.15);
+  border-radius: 10px;
+  color: var(--pearl);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+  resize: vertical;
+}
+.form-field textarea:focus,
+.form-field input[type=text]:focus,
+.form-field select:focus {
+  outline: none;
+  border-color: var(--primary-gold);
+  box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.15);
+}
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 720px) { .form-grid-2 { grid-template-columns: 1fr; } }
+
+/* Host typeahead */
+.host-search {
+  position: relative;
+}
+.host-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%; left: 0; right: 0;
+  z-index: 100;
+  max-height: 280px;
+  overflow-y: auto;
+  background: rgba(16,16,16,0.98);
+  border: 1px solid rgba(201, 169, 97, 0.3);
+  border-radius: 10px;
+  margin-top: 4px;
+  box-shadow: var(--shadow-luxury);
+  backdrop-filter: blur(20px);
+}
+.host-dropdown.visible { display: block; }
+.host-item {
+  padding: 10px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(201, 169, 97, 0.06);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+  display: flex; justify-content: space-between; gap: 12px;
+}
+.host-item:hover, .host-item.active {
+  background: rgba(201, 169, 97, 0.1);
+  color: var(--pearl);
+}
+.host-item .acc {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--dove-grey);
+}
+.host-item .count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--champagne);
+}
+.host-item.user-added {
+  background: rgba(184, 137, 97, 0.07);
+}
+.host-item.user-added .acc::after {
+  content: " · user-added";
+  color: var(--rose-gold);
+  font-style: italic;
+}
+.host-item.bulk-added .acc::after {
+  content: " · extended cache";
+  color: var(--dove-grey);
+  font-style: italic;
+}
+
+/* Request-a-genome panel — appears inline when the typeahead has no match */
+.request-genome-panel {
+  margin-top: 10px;
+  padding: 14px 16px;
+  background: rgba(201, 169, 97, 0.05);
+  border: 1px dashed rgba(201, 169, 97, 0.3);
+  border-radius: 10px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+.request-genome-panel .rg-title {
+  font-weight: 600;
+  color: var(--champagne);
+  margin-bottom: 6px;
+}
+.request-genome-panel .rg-hint {
+  color: var(--dove-grey);
+  font-size: 0.82rem;
+  margin-bottom: 10px;
+}
+.request-genome-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+.request-genome-row input[type="text"] {
+  flex: 1 1 200px;
+  min-width: 180px;
+  padding: 9px 12px;
+  background: rgba(10, 10, 10, 0.6);
+  border: 1px solid rgba(201, 169, 97, 0.2);
+  border-radius: 8px;
+  color: var(--pearl);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+}
+.request-genome-row input[type="text"]:focus {
+  outline: none;
+  border-color: var(--primary-gold);
+}
+.request-genome-row button {
+  padding: 9px 16px;
+  background: var(--gradient-gold);
+  border: none;
+  border-radius: 8px;
+  color: var(--deep-charcoal);
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+.request-genome-row button:hover { opacity: 0.9; }
+.request-genome-row button:disabled { opacity: 0.5; cursor: not-allowed; }
+.request-genome-status {
+  margin-top: 10px;
+  font-size: 0.82rem;
+  color: var(--champagne);
+  font-family: 'JetBrains Mono', monospace;
+  white-space: pre-wrap;
+}
+.request-genome-status.error { color: #E07B5F; }
+.request-genome-status.success { color: #8FC89F; }
+.request-genome-checkbox-row {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--dove-grey);
+}
+
+/* Radio toggles */
+.radio-group { display: flex; gap: 10px; margin-top: 6px; }
+.radio-option { flex: 1; position: relative; }
+.radio-option input[type="radio"] { position: absolute; opacity: 0; }
+.radio-option label {
+  display: block;
+  padding: 14px 16px;
+  background: rgba(10,10,10,0.6);
+  border: 1px solid rgba(201, 169, 97, 0.15);
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: var(--dove-grey);
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+}
+.radio-option input[type="radio"]:checked + label {
+  background: rgba(201, 169, 97, 0.12);
+  border-color: var(--primary-gold);
+  color: var(--pearl);
+  box-shadow: 0 0 0 2px rgba(201, 169, 97, 0.15);
+}
+.tier-info {
+  font-size: 0.86rem;
+  color: var(--dove-grey);
+  margin-top: 8px;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.submit-btn {
+  grid-column: 1 / -1;
+  padding: 18px 36px;
+  background: var(--gradient-gold);
+  border: none;
+  border-radius: 12px;
+  color: var(--deep-charcoal);
+  font-family: 'Inter', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: var(--shadow-elevated);
+  margin-top: 8px;
+}
+.submit-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-luxury), var(--glow-gold); }
+.submit-btn:disabled { opacity: 0.5; cursor: wait; transform: none; }
+.button-row {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+.button-row .submit-btn { flex: 1; }
+.submit-btn-secondary {
+  background: transparent;
+  color: var(--champagne);
+  border: 1px solid rgba(201, 169, 97, 0.35);
+  box-shadow: none;
+}
+.submit-btn-secondary:hover {
+  background: rgba(201, 169, 97, 0.08);
+  border-color: var(--primary-gold);
+  color: var(--pearl);
+  box-shadow: none;
+}
+.submit-btn .spinner {
+  display: inline-block; width: 14px; height: 14px;
+  border: 2px solid rgba(15,15,15,0.3);
+  border-top-color: var(--deep-charcoal);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-box {
+  display: none;
+  background: rgba(124, 29, 29, 0.18);
+  border-left: 3px solid var(--burgundy);
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin: 16px 0;
+  color: #FCA5A5;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+}
+.error-box.visible { display: block; }
+
+/* =================== RESULTS =================== */
+.viz-container {
+  position: relative;
+  display: none;
+  background: linear-gradient(145deg, rgba(26,26,26,0.95), rgba(42,42,42,0.85));
+  border: 1px solid rgba(201, 169, 97, 0.3);
+  border-radius: 24px;
+  padding: 44px;
+  margin: 28px 0;
+  box-shadow: var(--shadow-luxury);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+.viz-container.visible { display: block; }
+.viz-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.75rem;
+  color: var(--pearl);
+  padding-bottom: 14px;
+  margin-bottom: 6px;
+  position: relative;
+}
+.viz-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 60px; height: 3px;
+  background: var(--gradient-gold);
+  border-radius: 2px;
+}
+.viz-description {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  color: var(--rose-gold);
+  margin-bottom: 24px;
+  font-style: italic;
+  max-width: 900px;
+}
+
+.native-fallback-warn {
+  margin: 14px 0 18px 0;
+  padding: 12px 16px;
+  background: rgba(212, 165, 116, 0.08);
+  border: 1px solid rgba(212, 165, 116, 0.35);
+  border-left: 3px solid #D4A574;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  color: var(--pearl);
+  line-height: 1.5;
+}
+.results-meta {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  padding: 14px 22px;
+  background: rgba(201, 169, 97, 0.08);
+  border-radius: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+}
+.results-meta span { color: var(--champagne); }
+.results-meta strong { color: var(--pearl); font-weight: 600; margin-left: 6px; }
+
+.results-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+.results-table th {
+  text-align: left;
+  padding: 14px;
+  background: rgba(201, 169, 97, 0.08);
+  color: var(--champagne);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid rgba(201, 169, 97, 0.2);
+}
+.results-table td {
+  padding: 14px;
+  border-bottom: 1px solid rgba(201, 169, 97, 0.08);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+  color: var(--pearl);
+}
+.rank-pill {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  background: var(--gradient-gold);
+  color: var(--deep-charcoal);
+}
+.score-high { color: #22C55E; font-weight: 600; }
+.score-mid  { color: var(--champagne); }
+.score-low  { color: #EF4444; }
+
+#histogram { margin-top: 28px; min-height: 360px; }
+#host-scatter { margin-top: 18px; min-height: 420px; }
+.corpus-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: rgba(34,197,94,0.18);
+  border: 1px solid rgba(34,197,94,0.5);
+  color: #86EFAC;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  margin-left: 8px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.corpus-row td { background: rgba(34,197,94,0.06); }
+.corpus-row td:first-child { border-left: 3px solid #22C55E; }
+
+.glossary-toggle {
+  margin: 20px 0;
+  padding: 14px 20px;
+  background: rgba(26,26,26,0.6);
+  border: 1px solid rgba(201, 169, 97, 0.15);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--champagne);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  transition: all 0.3s;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.glossary-toggle::after {
+  content: '+';
+  font-size: 1.4rem;
+  color: var(--primary-gold);
+  transition: transform 0.3s;
+}
+.glossary-toggle.open::after { transform: rotate(45deg); }
+.glossary-toggle:hover {
+  border-color: var(--primary-gold);
+  background: rgba(26,26,26,0.9);
+}
+.glossary {
+  display: none;
+  padding: 22px 24px;
+  background: rgba(20,20,20,0.55);
+  border-radius: 12px;
+  margin: 8px 0 20px;
+  border: 1px solid rgba(201, 169, 97, 0.1);
+}
+.glossary.visible { display: block; }
+.glossary dt {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  color: var(--primary-gold);
+  margin-top: 14px;
+  font-size: 1.05rem;
+}
+.glossary dt:first-child { margin-top: 0; }
+.glossary dd {
+  color: var(--alabaster);
+  font-size: 0.95rem;
+  margin-top: 4px;
+  line-height: 1.6;
+  font-family: 'Inter', sans-serif;
+}
+
+/* =================== ABSTRACT =================== */
+.paper-abstract {
+  background: rgba(20,20,20,0.45);
+  border-left: 3px solid var(--primary-gold);
+  border-radius: 8px;
+  padding: 22px 26px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.08rem;
+  line-height: 1.65;
+  color: var(--alabaster);
+  font-style: italic;
+}
+.paper-abstract p { margin-bottom: 12px; }
+.paper-abstract p:last-child { margin-bottom: 0; }
+
+/* =================== FOOTER =================== */
+.footer {
+  text-align: center;
+  padding: 48px 0 32px;
+  color: var(--dove-grey);
+  font-size: 0.9rem;
+  border-top: 1px solid rgba(201, 169, 97, 0.1);
+  margin-top: 48px;
+}
+.footer a {
+  color: var(--champagne);
+  text-decoration: none;
+  margin: 0 14px;
+  transition: color 0.3s;
+  font-weight: 500;
+}
+.footer a:hover { color: var(--primary-gold); }
+.footer-mini { margin-top: 16px; font-size: 0.8rem; opacity: 0.6; }
+.hiring-cta {
+  margin: 60px 0 28px 0;
+  padding: 36px 32px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(201, 169, 97, 0.08) 0%, rgba(201, 169, 97, 0.02) 100%);
+  border: 1px solid rgba(201, 169, 97, 0.25);
+}
+.partner-cta { margin: 60px 0 12px 0; }
+.partner-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+.partner-card {
+  display: block;
+  padding: 22px 22px 24px;
+  border-radius: 12px;
+  background: rgba(26, 26, 26, 0.45);
+  border: 1px solid rgba(201, 169, 97, 0.2);
+  text-decoration: none;
+  color: var(--pearl);
+  transition: all 0.25s;
+}
+.partner-card:hover {
+  border-color: var(--primary-gold);
+  background: rgba(201, 169, 97, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(201, 169, 97, 0.12);
+}
+.partner-head {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  color: var(--champagne);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.partner-body { font-size: 0.9rem; opacity: 0.85; line-height: 1.5; }
+.partner-footer {
+  margin-top: 18px;
+  font-size: 0.88rem;
+  color: var(--champagne);
+  opacity: 0.85;
+}
+.credits { margin: 60px 0 40px 0; }
+.credits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 22px;
+  margin-top: 18px;
+}
+.credits-col {
+  padding: 20px 22px;
+  border-radius: 12px;
+  background: rgba(26, 26, 26, 0.35);
+  border: 1px solid rgba(201, 169, 97, 0.15);
+}
+.credits-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--primary-gold);
+  margin-bottom: 10px;
+}
+.credits-col ul { margin: 0; padding-left: 18px; }
+.credits-col li {
+  font-size: 0.86rem;
+  color: var(--pearl);
+  opacity: 0.88;
+  margin-bottom: 8px;
+  line-height: 1.55;
+}
+.credits-col a { color: var(--champagne); text-decoration: none; border-bottom: 1px dotted rgba(212, 197, 160, 0.3); }
+.credits-col a:hover { color: var(--primary-gold); border-bottom-color: var(--primary-gold); }
+.credits-col code {
+  background: rgba(201, 169, 97, 0.1);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+}
+.hiring-inner { max-width: 780px; margin: 0 auto; text-align: center; }
+.hiring-inner h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  color: var(--champagne);
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.hiring-inner p {
+  color: var(--pearl);
+  opacity: 0.85;
+  line-height: 1.55;
+  margin-bottom: 20px;
+}
+.hiring-btn {
+  display: inline-block;
+  padding: 12px 28px;
+  background: transparent;
+  color: var(--primary-gold);
+  border: 1px solid var(--primary-gold);
+  border-radius: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: all 0.25s;
+}
+.hiring-btn:hover {
+  background: var(--primary-gold);
+  color: var(--deep-charcoal);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(201, 169, 97, 0.3);
+}
+</style>
+</head>
+<body>
+
+<!-- =================== STICKY HEADER =================== -->
+<header class="sticky-header">
+  <a href="#top" class="sticky-header-inner">
+    <img src="aikium_logo.png" alt="Aikium" class="sticky-logo">
+    <span class="sticky-title">Aiki-XP</span>
+    <span class="sticky-sub">Aikium · Nature Biotechnology 2026</span>
+  </a>
+  <a href="mailto:partnerships@aikium.com" class="sticky-action">partnerships</a>
+</header>
+
+<div class="container" id="top">
+
+  <!-- =================== HERO (compact) =================== -->
+  <div class="hero">
+    <div class="logo-box"><img src="aikium_logo.png" alt="Aikium"></div>
+    <div class="hero-eyebrow">Aikium Inc. · Nature Biotechnology 2026</div>
+    <h1>Aiki-XP</h1>
+    <p class="tagline">Leakage-controlled multimodal prediction of within-species relative protein expression at pan-bacterial scale.</p>
+    <div class="hero-inline-stats">
+      <span>ρ<sub>nc</sub> = <strong>0.592</strong></span>
+      <span><strong>492,026</strong> genes</span>
+      <span><strong>385</strong> species</span>
+      <span id="hero-hosts-stat"><strong>1,831</strong> host genomes</span>
+      <span><strong>5</strong> deployment tiers</span>
+    </div>
+  </div>
+
+  <!-- =================== FORM PANEL (above the fold) =================== -->
+  <div class="panel">
+    <h2>Try Aiki-XP</h2>
+    <p class="panel-sub">Click one of the three example buttons to pre-fill the form with a different input style. Each represents a common user scenario.</p>
+
+    <div class="example-row">
+      <span class="example-label">Example by input type:</span>
+      <button class="example-btn" data-ex="protein_only" title="Protein sequence only. Selects Tier A (no CDS, no host needed).">Protein AA only (Tier A)</button>
+      <button class="example-btn" data-ex="protein_cds" title="Protein + CDS. Selects Tier B — heterologous-mode prediction in the default host.">Protein + CDS (Tier B)</button>
+      <button class="example-btn" data-ex="full" title="Protein + CDS + host + native mode. Selects Tier D (5 modalities: protein, DNA, classical biophysics, operon, genome — paper's champion recipe).">Everything (Tier D, native)</button>
+    </div>
+
+    <div class="framing" style="margin: 8px 0 24px; font-size: 0.98rem;">
+      <strong>Already a known gene?</strong> If your protein is one of the 244,002 CV test-split genes
+      from the paper, skip this form and query
+      <a href="https://aikium--aikixp-tier-a-lookup-gene.modal.run" style="color:var(--primary-gold);" target="_blank" rel="noopener">/lookup_gene</a>
+      for the exact held-out prediction (the number the paper reports). This form runs live inference
+      — useful for novel proteins, and for sanity-checking the pipeline.
+    </div>
+
+
+    <form id="predict-form" class="form-grid">
+      <div class="form-field">
+        <label>Protein sequence <span class="info" tabindex="0" data-tip="The amino-acid sequence your gene encodes. One-letter codes (A,C,D,E,F,G,H,I,K,L,M,N,P,Q,R,S,T,V,W,Y). No stop symbol.">?</span></label>
+        <textarea id="protein" rows="5" placeholder="MKTVRQERLKSIVRILERSKEPVSGAQLAEELSVSRQVIVQDIAYLRSLGYNIVATPRGYVLAGGPGLGLNHVGQIIR" required></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>Coding DNA sequence (CDS) <span class="info" tabindex="0" data-tip="The DNA that codes for the protein above, from the start codon (ATG) to the stop codon. Should be a multiple of 3 and encode the same protein after translation.">?</span></label>
+        <textarea id="cds" rows="5" placeholder="ATGAAAACTGTCCGTCAGGAACGCCTGAAG..." required></textarea>
+        <button type="button" class="example-btn" id="autofill-cds-btn" style="margin-top: 8px;">
+          <span id="autofill-cds-label">Auto-fill CDS from protein + host</span>
+        </button>
+        <div class="tier-info" id="cds-status" style="margin-top: 6px; min-height: 1em;"></div>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-field">
+          <label>Host organism <span class="info" tabindex="0" data-tip="Aiki-XP knows 1,831 bacterial reference genomes. Start typing the species name or NCBI accession (e.g. 'coli' or 'NC_000913').">?</span></label>
+          <div class="host-search">
+            <input type="text" id="host-input" autocomplete="off" placeholder="Start typing — e.g. Escherichia coli, B. subtilis, NC_000913..." />
+            <div class="host-dropdown" id="host-dropdown"></div>
+          </div>
+          <div style="margin-top:8px;">
+            <button type="button" class="example-btn" id="find-host-btn" style="font-size:0.82rem;padding:6px 12px;" title="Given the protein you've pasted, use ESM-C similarity to find its most likely native organism in our 492K corpus and auto-fill that as the host.">
+              <span id="find-host-label">🧭 Find closest host from protein</span>
+            </button>
+            <span id="find-host-status" style="font-size:0.82rem;color:var(--champagne);opacity:0.85;margin-left:10px;"></span>
+          </div>
+          <div class="tier-info" id="host-current" style="margin-top:8px;">Currently: <strong>Escherichia coli K12</strong> (NC_000913.3)</div>
+          <div class="tier-info" style="margin-top: 4px;">Don't see your organism? Type an NCBI accession in the search box (e.g. <code>NC_000913.3</code>) — if nothing matches, we'll offer to download it on demand.</div>
+          <div class="request-genome-panel" id="request-genome-panel" style="display: none;">
+            <div class="rg-title">Request a new host genome</div>
+            <div class="rg-hint">
+              Paste an NCBI chromosome accession (RefSeq <code>NC_*</code>/<code>NZ_*</code>,
+              GenBank <code>CP*</code>/<code>CM*</code>). We'll fetch it from NCBI, validate
+              the CDS annotations, and add it to your host dropdown. Typical wait:
+              ~30&nbsp;s for the fetch + ~5–30&nbsp;min if you also request Bacformer
+              pre-compute (optional — only needed to warm up Tier D).
+            </div>
+            <div class="request-genome-row">
+              <input type="text" id="rg-accession" placeholder="NC_000913.3" autocomplete="off" />
+              <button type="button" id="rg-submit-btn">Request genome</button>
+            </div>
+            <div class="request-genome-checkbox-row">
+              <input type="checkbox" id="rg-compute-bacformer" />
+              <label for="rg-compute-bacformer">Pre-compute Bacformer-large cache (Tier D warms up; adds 5–30 min)</label>
+            </div>
+            <div class="request-genome-status" id="rg-status"></div>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label>Expression context <span class="info" tabindex="0" data-tip="Native = your CDS already exists in the host genome (Aiki-XP finds its real operon). Heterologous = your CDS is foreign; we wrap it in the host's lacZ chromosomal context (100 nt upstream + CDS + 50 nt downstream). Default: heterologous.">?</span></label>
+          <div class="radio-group">
+            <div class="radio-option">
+              <input type="radio" id="mode-native" name="mode" value="native">
+              <label for="mode-native">Native gene</label>
+            </div>
+            <div class="radio-option">
+              <input type="radio" id="mode-hetero" name="mode" value="heterologous" checked>
+              <label for="mode-hetero">Heterologous</label>
+            </div>
+          </div>
+          <div class="tier-info">Native uses your CDS's real operon; heterologous wraps it in lacZ.</div>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label>Prediction tier <span class="info" tabindex="0" data-tip="The five deployment tiers differ in which inputs they consume. A needs only a protein; B adds CDS-derived biophysical features; C adds operon DNA; D adds whole-genome context. Higher tiers → higher accuracy but more inputs required.">?</span></label>
+        <div class="radio-group" style="flex-wrap: wrap;">
+          <div class="radio-option" style="flex: 1 1 130px;">
+            <input type="radio" id="tier-a" name="tier" value="A">
+            <label for="tier-a">Tier A · ρ<sub>nc</sub>=0.518</label>
+          </div>
+          <div class="radio-option" style="flex: 1 1 130px;">
+            <input type="radio" id="tier-b" name="tier" value="B">
+            <label for="tier-b">Tier B · ρ<sub>nc</sub>=0.531</label>
+          </div>
+          <div class="radio-option" style="flex: 1 1 130px;opacity:0.5;" title="Tier B+ live inference is temporarily offline on this Modal deployment — see the footnote below.">
+            <input type="radio" id="tier-bp" name="tier" value="B+" disabled>
+            <label for="tier-bp" style="cursor:not-allowed;">Tier B+*</label>
+          </div>
+          <div class="radio-option" style="flex: 1 1 130px;">
+            <input type="radio" id="tier-c" name="tier" value="C">
+            <label for="tier-c">Tier C · ρ<sub>nc</sub>=0.575</label>
+          </div>
+          <div class="radio-option" style="flex: 1 1 130px;">
+            <input type="radio" id="tier-d" name="tier" value="D" checked>
+            <label for="tier-d">Tier D (XP5) · ρ<sub>nc</sub>=0.592</label>
+          </div>
+        </div>
+        <div class="tier-info" id="tier-requirements">Tier D uses all five modalities (protein + CDS + host genome).</div>
+        <div class="tier-info" style="margin-top:4px;opacity:0.65;font-size:0.78rem;">* Tier B+ live inference is offline on this Modal deployment (Evo-2 1B requires Transformer Engine, which won't build on Modal's image). Cached paper ρ<sub>nc</sub>=0.543 remains available via <code>/lookup_gene</code>.</div>
+      </div>
+
+      <div class="button-row">
+        <button type="submit" class="submit-btn" id="submit-btn">Run prediction</button>
+        <button type="button" class="submit-btn submit-btn-secondary" id="compare-btn" title="Fires Tier A, B, C, and D in parallel and shows the tier ladder. Tier B+ is temporarily offline for correction and is skipped.">Compare tiers A, B, C, D</button>
+        <button type="button" class="submit-btn submit-btn-secondary" id="prewarm-btn" title="Fires one small request to each GPU tier to wake the Modal containers before you submit. Optional — use it when you know you're about to run and want to avoid cold-start waits." style="max-width:140px;">🔥 Pre-warm</button>
+      </div>
+      <div id="stale-results-warn" class="stale-results-warn" style="display:none;">
+        ⚠ The results below are for your <em>previous</em> submission. Click <strong>Run prediction</strong> (or <strong>Compare tiers</strong>) to recompute for the sequence currently in the form.
+      </div>
+    </form>
+
+    <div id="error-box" class="error-box"></div>
+  </div>
+
+  <!-- =================== HOST PROTEOME CALIBRATION =================== -->
+  <div id="host-scatter-panel" class="viz-container" style="display:none;">
+    <h2 class="viz-title">Host proteome calibration</h2>
+    <p class="viz-description" id="host-scatter-description">
+      Every blue (non-conserved) and gold (conserved) dot is a test-split gene in this host —
+      x-axis: its PaxDb/Abele measured abundance (per-species z-score);
+      y-axis: Aiki-XP's held-out Tier D prediction for that gene.
+      A tight cloud along the diagonal means Aiki-XP is well-calibrated for this host.
+      Your submitted gene will appear as a bright gold marker once the prediction completes.
+    </p>
+    <div class="results-meta" id="host-scatter-meta">
+      <span>Host <strong id="hs-host">—</strong></span>
+      <span>Test genes <strong id="hs-n">—</strong></span>
+      <span>ρ<sub>overall</sub> <strong id="hs-rho">—</strong></span>
+      <span>ρ<sub>non-mega</sub> <strong id="hs-rho-nm">—</strong></span>
+    </div>
+    <div id="host-scatter"></div>
+  </div>
+
+  <!-- =================== RESULTS =================== -->
+  <div id="results" class="viz-container">
+    <h2 class="viz-title">Your prediction</h2>
+    <p class="viz-description">The triangle marks your gene on the host's per-species expression distribution. Genes to the right are predicted high expressers for that host.</p>
+
+    <div class="results-meta">
+      <span>Tier <strong id="result-tier">—</strong></span>
+      <span>Host <strong id="result-host">—</strong></span>
+      <span>Mode <strong id="result-mode">—</strong></span>
+      <span>Operon <strong id="result-operon-source">—</strong></span>
+      <span>Operon length <strong id="result-operon-length">—</strong> nt</span>
+    </div>
+
+    <div id="native-fallback-warn" class="native-fallback-warn" style="display:none;"></div>
+
+    <table class="results-table">
+      <thead>
+        <tr>
+          <th>Gene</th>
+          <th>Predicted z-score</th>
+          <th>Host percentile</th>
+          <th>Interpretation</th>
+        </tr>
+      </thead>
+      <tbody id="results-tbody"></tbody>
+    </table>
+
+    <div id="histogram"></div>
+
+    <div id="dissect-panel" style="display:none;margin-top:24px;">
+      <details class="dissect-expander">
+        <summary>Dissect this prediction — confidence, biophysics, outlier flags</summary>
+        <div class="dissect-inner">
+          <!-- Confidence block -->
+          <div class="dissect-block">
+            <div class="dissect-label">Reliability</div>
+            <div id="dissect-confidence-row" class="dissect-row">—</div>
+            <div id="dissect-calibration-row" class="dissect-row" style="opacity:0.85;">—</div>
+          </div>
+          <!-- Biophysics block -->
+          <div class="dissect-block">
+            <div class="dissect-label">Biophysical snapshot</div>
+            <table class="dissect-table">
+              <tbody id="dissect-biophys-tbody"></tbody>
+            </table>
+          </div>
+          <!-- Out-of-distribution flags -->
+          <div class="dissect-block">
+            <div class="dissect-label">In-distribution check</div>
+            <div id="dissect-ood-row" class="dissect-row">—</div>
+          </div>
+          <!-- Modality attribution (Tier D only) -->
+          <div id="dissect-attribution-block" class="dissect-block" style="display:none;">
+            <div class="dissect-label">What drove this prediction</div>
+            <p class="dissect-row" id="attribution-narrative" style="margin:4px 0 8px 0;">Leave-one-out ablation of each Tier D modality. Bar length = change in predicted z-score if that modality is zero-filled. Positive bars mean the modality <em>contributed positively</em> to the final prediction.</p>
+            <div id="attribution-chart"></div>
+          </div>
+          <p class="dissect-footer">Everything here is computed from data already in the response or from your protein/CDS string — modality attribution uses additional GPU calls (auto-computed on Tier D runs).</p>
+        </div>
+      </details>
+    </div>
+
+    <div id="neighbors-panel" style="display:none;margin-top:24px;padding-top:24px;border-top:1px solid rgba(201,169,97,0.15);">
+      <h3 style="font-family:'Playfair Display',serif;color:var(--champagne);margin:0 0 4px 0;font-weight:500;">Similar proteins in the 492K corpus</h3>
+      <p class="viz-description">The five nearest neighbours by ESM-C embedding cosine similarity. Each row shows the paper's measured truth and held-out Tier D prediction — a direct trust indicator for how the model behaves on sequence-space neighbours of your gene.</p>
+      <table class="results-table" style="margin-top:12px;">
+        <thead>
+          <tr><th>Neighbour</th><th>Species</th><th>Similarity</th><th>PaxDb truth</th><th>Tier D CV</th></tr>
+        </thead>
+        <tbody id="neighbors-tbody"></tbody>
+      </table>
+    </div>
+
+    <div id="tier-compare-panel" style="display:none;margin-top:24px;padding-top:24px;border-top:1px solid rgba(201,169,97,0.15);">
+      <h3 style="font-family:'Playfair Display',serif;color:var(--champagne);margin:0 0 4px 0;font-weight:500;">The tier ladder for this gene</h3>
+      <p class="viz-description" id="tier-compare-narrative">Each tier adds a modality. The gap from Tier A to Tier D is how much operon + genome context is worth on this sequence.</p>
+      <div id="tier-compare-chart"></div>
+      <table class="results-table" style="margin-top:16px;">
+        <thead>
+          <tr><th>Tier</th><th>Modalities</th><th>Predicted z</th><th>Δ vs Tier A</th><th>Latency</th></tr>
+        </thead>
+        <tbody id="tier-compare-tbody"></tbody>
+      </table>
+    </div>
+
+    <div id="structure-panel" style="display:none;margin-top:24px;padding-top:24px;border-top:1px solid rgba(201,169,97,0.15);">
+      <h3 style="font-family:'Playfair Display',serif;color:var(--champagne);margin:0 0 4px 0;font-weight:500;">Predicted 3D structure</h3>
+      <p class="viz-description" id="structure-desc">
+        ESMFold v1 (Meta AI) structure prediction for your protein, served via the public ESMFold Atlas API.
+        Colouring by per-residue pLDDT confidence.
+        <span style="display:inline-block; margin-left:8px; font-size:0.78rem;">
+          <span style="color:#2E9EE0;">●</span> very high (≥90)
+          &nbsp;<span style="color:#7FC99B;">●</span> confident (70–90)
+          &nbsp;<span style="color:#E8C14D;">●</span> low (50–70)
+          &nbsp;<span style="color:#E8732D;">●</span> very low (&lt;50)
+        </span>
+      </p>
+      <div class="structure-controls">
+        <button type="button" class="example-btn" id="structure-btn">Fold this protein</button>
+        <span id="structure-status" class="structure-status"></span>
+      </div>
+      <div id="structure-viewer" style="width:100%;height:460px;display:none;background:rgba(10,10,10,0.3);border-radius:10px;border:1px solid rgba(201,169,97,0.15);margin-top:10px;position:relative;"></div>
+    </div>
+
+    <div id="umap-panel" style="display:none;margin-top:24px;padding-top:24px;border-top:1px solid rgba(201,169,97,0.15);">
+      <h3 style="font-family:'Playfair Display',serif;color:var(--champagne);margin:0 0 4px 0;font-weight:500;">Where your protein sits in the XP5 embedding landscape</h3>
+      <p class="viz-description">
+        40,000 corpus genes plotted in the paper's fused UMAP space (Fig. 3 /
+        <code>si_umap_anatomy</code>). Points coloured by held-out Tier D
+        prediction (gold = high expresser, blue = low, grey = training split).
+        Your protein's position is inferred from its 10 nearest ESM-C neighbours
+        and shown as a gold star — approximate projection, not an exact UMAP.
+      </p>
+      <div class="umap-controls">
+        <label for="umap-modality">Embedding:</label>
+        <select id="umap-modality">
+          <option value="fused">Fused XP5 (paper figure)</option>
+          <option value="esmc_protein">ESM-C protein</option>
+          <option value="evo2_operon">Evo-2 7B full operon</option>
+          <option value="bacformer">Bacformer genome</option>
+          <option value="hyenadna_cds">HyenaDNA CDS</option>
+          <option value="biophysical">Biophysical features</option>
+          <option value="rinalmo_init">RiNALMo init window</option>
+        </select>
+        <span id="umap-status" class="umap-status"></span>
+      </div>
+      <div id="umap-chart"></div>
+    </div>
+
+    <div class="share-row">
+      <button type="button" class="example-btn" id="share-btn">📋 Copy share link</button>
+      <button type="button" class="example-btn" id="share-json-btn">{&nbsp;} Copy raw JSON</button>
+      <span class="share-hint" id="share-hint">Anyone opening the link reproduces this exact prediction</span>
+      <span class="share-toast" id="share-toast">Copied!</span>
+    </div>
+  </div>
+
+  <!-- =================== METRICS (below form) =================== -->
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-value">492,026</div>
+      <div class="metric-label">Genes</div>
+      <div class="metric-desc">across 385 bacterial species</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">ρ<sub>nc</sub>=0.592</div>
+      <div class="metric-label">Non-conserved</div>
+      <div class="metric-desc">gene-operon holdout, 5-fold CV</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">5</div>
+      <div class="metric-label">Deployment Tiers</div>
+      <div class="metric-desc">protein → operon → genome</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">1,831</div>
+      <div class="metric-label">Host Genomes</div>
+      <div class="metric-desc">available as operon context</div>
+    </div>
+  </div>
+
+  <!-- =================== HOW IT WORKS =================== -->
+  <div class="how-section">
+    <h2 class="section-title">How Aiki-XP works</h2>
+    <p class="section-sub">Three steps from a protein sequence to a ranked prediction.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Submit a protein + its CDS</h3>
+        <p>Paste the amino-acid sequence and the coding-DNA sequence that produces it. Pick the bacterial host you plan to express in — any of 1,831 reference genomes.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Extract five modalities</h3>
+        <p>Aiki-XP places your CDS in its genomic neighborhood (native gene, or wrapped in the host's lacZ context for heterologous expression), then extracts five biological modalities: genome context (Bacformer-large), operon architecture (Evo-2 7B), CDS composition (HyenaDNA), protein identity (ESM-C), and per-gene biophysical features.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Rank within the proteome</h3>
+        <p>A 25M-parameter fusion head returns a per-species z-score: where your gene sits on the host's expression distribution. Above-median suggests a favorable expression candidate; low suggests unfavorable.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================== FRAMING =================== -->
+  <div class="framing">
+    <strong>What this predicts.</strong> Aiki-XP ranks expression candidates <em>within</em> a host's proteome.
+    It reports whether your gene is a high, medium, or low expresser relative to other genes in the
+    selected host. It does <em>not</em> predict absolute protein yield in µg/mL. For choosing among
+    multiple candidates in a given host, rank is the right signal; for absolute yield, wet-lab
+    screening remains necessary.
+  </div>
+
+  <!-- =================== LIMITATIONS =================== -->
+  <div class="limitations-panel">
+    <h2 class="section-title" style="margin-bottom:8px;">Where Aiki-XP works — and where it doesn't</h2>
+    <p class="section-sub">Honesty up front. These are the known limits of this release.</p>
+    <div class="limits-grid">
+      <div class="limit-card limit-works">
+        <div class="limit-head">✓ Works well for</div>
+        <ul>
+          <li>Ranking native bacterial proteins within their own host genome (Spearman ρ<sub>nc</sub>=0.59).</li>
+          <li>Heterologous candidates where the target host is one of our 1,831 cached bacterial genomes.</li>
+          <li>Sequences in the same length range as the training set (~50-2000 aa); works best at ~150-800 aa.</li>
+          <li>Comparisons among candidates: absolute z is noisy, but rank order within a design library is the signal the paper evaluates.</li>
+        </ul>
+      </div>
+      <div class="limit-card limit-caution">
+        <div class="limit-head">⚠ Use with care for</div>
+        <ul>
+          <li>Hosts outside the cached 1,831 genomes — pick the closest phylogenetic neighbour, or submit the NCBI accession and we'll add it.</li>
+          <li>Point mutants of a known protein — the tier ladder is designed for rank-order over diverse sequences, not fine-grained effect sizes of single substitutions.</li>
+          <li>Proteins with unusual features (membrane-spanning regions, disulfide-heavy, heavily glycosylated in the native context) — training coverage is thin for these classes.</li>
+          <li>Individual z-scores read as calibrated absolute numbers — expect MAE ≈ 0.47 per non-conserved gene, 95% of predictions within |Δ|&lt;1.5.</li>
+        </ul>
+      </div>
+      <div class="limit-card limit-no">
+        <div class="limit-head">× Will not work for</div>
+        <ul>
+          <li>Eukaryotic hosts (yeast, CHO, plant, mammalian) — this model is pan-bacterial only. Retraining on eukaryotic corpora is out-of-distribution.</li>
+          <li>Absolute expression prediction in µg/mL — we predict per-species rank, not yield. Use wet-lab measurement for absolute values.</li>
+          <li>Tagged sequences (His6/His10, HiBit, FLAG, GST, SUMO) scored with the tag intact — strip tags first (<code>aikixp.sequence_normalization</code>). The model is trained on untagged native proteins.</li>
+          <li>Cell-free / synthetic expression systems — Aiki-XP is trained on in-vivo PaxDb + Abele atlases; reactions in the PURE system or yeast-lysate TXTL are out of distribution.</li>
+          <li>Toxic proteins or ones that the host cannot fold — the model is a rank-order predictor of expression potential; it does not account for post-translation degradation, aggregation, or host death.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="limits-footer">
+      For the full failure-mode analysis, including per-domain calibration and the external-validation benchmarks where we explicitly lose to specialized tools, see §4 (Limitations) of the <a href="https://doi.org/10.5281/zenodo.19639621" style="color:var(--primary-gold);">paper</a>.
+    </p>
+  </div>
+
+  <!-- Compute footprint: condensed to a small note under the Framing block. -->
+  <p class="compute-footnote">
+    <strong>Compute footprint.</strong> Warm per-request latency: Tier A 15 s (CPU), Tier B/C/D 5-10 s (A100).
+    Cold-start 30-120 s after ~5 min idle. Approx cost: $0.001/request for Tier A, $0.004-0.006 for GPU tiers.
+    Paper training totals: XP5 360 A100-h (5 folds × 72 h) + embedding extraction ~1000 A100-h across Evo-2, Bacformer, ESM-C / ProtT5 / HyenaDNA. Full traces: Zenodo.
+  </p>
+
+  <!-- Reproducibility: pointer to Colab, not an in-browser button.
+       The in-browser 500-row sampler was removed because per-fold SD at
+       n=500 (~0.16) made the "reproduction" look noisier than the paper's
+       ±0.012 — undercutting rather than confirming the headline numbers.
+       Full reproduction belongs in the Colab notebook (or locally against
+       the Zenodo parquet), where n=244K drops SD to the paper's band. -->
+  <p class="compute-footnote" style="max-width:760px;">
+    <strong>Reproducibility.</strong> The paper's 244,002 held-out 5-fold CV
+    predictions are public via <code>POST /lookup_gene</code> and the Zenodo
+    archive (<a href="https://doi.org/10.5281/zenodo.19639621" style="color:var(--primary-gold);">10.5281/zenodo.19639621</a>).
+    To reproduce the headline per-fold Spearman ρ_nm = 0.590 ± 0.012 (Tier D)
+    against the full corpus, run the
+    <a href="https://colab.research.google.com/github/aikium-public/aiki-xp/blob/main/notebooks/aiki_xp_colab_quickstart.ipynb" style="color:var(--primary-gold);">Colab quickstart notebook</a>
+    (free-tier, CPU, ~3 min). Any smaller in-browser subsample is too noisy
+    to confirm the paper's error bars.
+  </p>
+
+  <!-- =================== ABSTRACT =================== -->
+  <div class="how-section">
+    <h2 class="section-title">Abstract</h2>
+    <p class="section-sub">From the Nature Biotechnology 2026 submission, verbatim.</p>
+    <blockquote class="paper-abstract">
+      <p>Generalizable protein-expression prediction can accelerate protein engineering, inform disease mechanisms, and help optimize heterologous recombinant protein production. Protein expression is governed by many interacting parameters that no single omics view captures. We develop Aiki-XP, a multimodal fusion platform integrating four biological scales (genome context, operon architecture, coding-sequence composition, protein identity) plus per-gene biophysical features across 492,026 genes from 385 bacterial species. Aiki-XP predicts within-species relative abundance (per-species z-score rank), not absolute copies per cell. Under a leakage-controlled gene-operon split Aiki-XP reaches Spearman ρ<sub>nc</sub>=0.592 on non-conserved genes versus 0.509 for ESM-C 600M alone, and each tier of a monotone protein → operon → genome deployment ladder yields a statistically significant gain. All recipes were locked before external evaluation; transfer to heterologous, cross-species, and novel-phylum benchmarks demonstrates utility and limits. Ablation and scaling experiments identify operon-scale genomic context, not protein-language-model capacity, as the rate-limiting input for bacterial expression prediction at this scale.</p>
+    </blockquote>
+  </div>
+
+  <!-- =================== GLOSSARY =================== -->
+  <div class="glossary-toggle" id="glossary-toggle">Glossary of terms</div>
+  <dl class="glossary" id="glossary">
+    <dt>ρ (Spearman rank correlation)</dt>
+    <dd>A measure between -1 and 1 of how well the model's predicted ranking agrees with the true ranking of gene expression. 1 = perfect agreement, 0 = no correlation.</dd>
+    <dt>ρ<sub>nc</sub> (non-conserved Spearman)</dt>
+    <dd>The same metric, but computed only on genes that do <em>not</em> belong to conserved protein families spanning many species (e.g. ribosomal proteins). This prevents the model from getting credit for recognizing family identity.</dd>
+    <dt>Per-species z-score</dt>
+    <dd>Each gene's expression is re-expressed as how many standard deviations above (or below) the mean of <em>its own host species</em>. This removes systematic differences between species and between proteomics platforms.</dd>
+    <dt>Operon</dt>
+    <dd>A cluster of bacterial genes co-transcribed from a single promoter into a single mRNA. Neighboring genes in the same operon often share regulatory fate.</dd>
+    <dt>Tier D, a.k.a. XP5 (paper configuration)</dt>
+    <dd>The full 5-modality Aiki-XP model. The paper refers to this configuration as "XP5" — both because it fuses <em>5 biological modalities</em> (genome context via Bacformer-large, operon architecture via Evo-2 7B, CDS composition via HyenaDNA, protein identity via ESM-C, and per-gene biophysical features) and because it is evaluated under <em>5-fold cross-validation</em>. The biophysical modality is itself the concatenation of five feature blocks (codon usage, protein properties, disorder, operon structure, RNA folding) — an internal implementation detail that we count as one modality in the paper's framing.</dd>
+    <dt>Native vs. heterologous</dt>
+    <dd>Native: your CDS exists in the chosen host genome, so Aiki-XP uses its real operon context. Heterologous: your CDS is foreign to the host; we wrap it in the host's lacZ promoter-CDS-terminator context, reflecting a common recombinant-expression protocol.</dd>
+    <dt>Gene-operon split</dt>
+    <dd>The leakage-control scheme used to evaluate Aiki-XP. Genes are grouped into MMseqs2 clusters and partitioned at the cluster level between train and test, so no test gene shares a protein family with any training gene.</dd>
+  </dl>
+
+  <!-- =================== PARTNERSHIPS =================== -->
+  <div class="partner-cta" style="margin:60px 0 24px 0;text-align:center;">
+    <a href="mailto:partnerships@aikium.com?subject=Aiki-XP%20partnership%20inquiry" class="hiring-btn">Partner with us → partnerships@aikium.com</a>
+    <div style="margin-top:10px;font-size:0.84rem;color:var(--champagne);opacity:0.78;">Research collaborations, enterprise deployment, custom host additions, or anything else.</div>
+  </div>
+
+  <!-- =================== CREDITS =================== -->
+  <div class="credits">
+    <h2 class="section-title" style="margin-bottom:6px;">Built on the work of many</h2>
+    <p class="section-sub">Aiki-XP would not exist without the foundation models, datasets, and infrastructure released by these teams. If you're building on top of Aiki-XP, please cite them too.</p>
+    <div class="credits-grid">
+      <div class="credits-col">
+        <div class="credits-label">Infrastructure</div>
+        <ul>
+          <li><a href="https://modal.com" target="_blank" rel="noopener">Modal Labs</a> — serverless GPU hosting. Every prediction on this page runs on Modal containers; their startup-program credits made the live demo possible.</li>
+          <li><a href="https://zenodo.org" target="_blank" rel="noopener">Zenodo</a> — permanent data + model-weights archive (CC-BY 4.0).</li>
+          <li><a href="https://github.com/aikium-public/aiki-xp" target="_blank" rel="noopener">GitHub</a> — source code, issues, discussions (Apache 2.0).</li>
+        </ul>
+      </div>
+      <div class="credits-col">
+        <div class="credits-label">Foundation models</div>
+        <ul>
+          <li><a href="https://www.evolutionaryscale.ai" target="_blank" rel="noopener">ESM-C</a> (EvolutionaryScale)</li>
+          <li><a href="https://github.com/agemagician/ProtTrans" target="_blank" rel="noopener">ProtT5-XL</a> (Elnaggar et al.)</li>
+          <li><a href="https://huggingface.co/LongSafari" target="_blank" rel="noopener">HyenaDNA</a> (Nguyen et al.)</li>
+          <li><a href="https://arcinstitute.org/manuscripts/Evo2" target="_blank" rel="noopener">Evo-2</a> (Brixi, Hsu, Hie et al., Arc Institute)</li>
+          <li><a href="https://github.com/macwiatrak/Bacformer" target="_blank" rel="noopener">Bacformer</a> (Wiatrak, Weimann, Floto et al.)</li>
+          <li><a href="https://www.tbi.univie.ac.at/RNA/" target="_blank" rel="noopener">ViennaRNA</a> (Lorenz et al.)</li>
+        </ul>
+      </div>
+      <div class="credits-col">
+        <div class="credits-label">Data</div>
+        <ul>
+          <li><a href="https://pax-db.org" target="_blank" rel="noopener">PaXDb v6.0</a> (Huang et al. 2025) — integrated quantitative proteomics</li>
+          <li><strong>Abele et al. 2025</strong> — bacterial proteomics atlas (<em>Mol. Cell. Proteomics</em>, MassIVE <code>MSV000096603</code>)</li>
+          <li><a href="https://www.ncbi.nlm.nih.gov/refseq/" target="_blank" rel="noopener">NCBI RefSeq</a> — 4,566 reference bacterial genomes</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================== FOOTER =================== -->
+  <div class="footer">
+    <a href="https://github.com/aikium-public/aiki-xp" target="_blank" rel="noopener">GitHub</a>·
+    <a href="https://doi.org/10.5281/zenodo.19639621" target="_blank" rel="noopener">Data (Zenodo)</a>·
+    <a href="#" target="_blank" rel="noopener" id="paper-link">bioRxiv preprint</a>·
+    <a href="https://github.com/aikium-public/aiki-xp/blob/main/ROADMAP.md" target="_blank" rel="noopener">Roadmap</a>·
+    <a href="https://github.com/aikium-public/aiki-xp/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>·
+    <a href="https://www.aikium.com" target="_blank" rel="noopener">Aikium</a>·
+    <a href="mailto:partnerships@aikium.com" rel="noopener">Partnerships</a>·
+    <a href="mailto:careers@aikium.com" rel="noopener">Careers</a>
+    <div class="footer-mini" id="host-cache-breakdown">Loading host manifest…</div>
+    <div class="footer-mini">© 2026 Aikium Inc. · Built on <a href="https://modal.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(201,169,97,0.4);">Modal</a> · Apache 2.0 code · CC-BY 4.0 data · <a href="https://pypi.org/project/aikixp-client/" target="_blank" rel="noopener" style="color:inherit;">pip install aikixp-client</a></div>
+  </div>
+
+</div>
+
+<script>
+/* =========================== ENDPOINTS =========================== */
+const TIER_A_URL     = 'https://aikium--aikixp-tier-a-predict-fasta.modal.run';
+const TIER_B_URL     = 'https://aikium--aikixp-tier-d-predict-tier-b-endpoint.modal.run';
+const TIER_B_PLUS_URL = 'https://aikium--aikixp-tier-d-predict-tier-b-plus-endpoint.modal.run';
+const TIER_C_URL     = 'https://aikium--aikixp-tier-d-predict-tier-c-endpoint.modal.run';
+const TIER_D_URL     = 'https://aikium--aikixp-tier-d-predict-tier-d-endpoint.modal.run';
+const CDS_FOR_PROTEIN_URL = 'https://aikium--aikixp-tier-a-cds-for-protein.modal.run';
+
+const TIER_META = {
+  A:    { url: TIER_A_URL, needs: ['protein'],
+          desc: 'Tier A: protein sequence only (ESM-C + ProtT5). No CDS or host needed. ~5 s warm, ~50 s cold.' },
+  B:    { url: TIER_B_URL, needs: ['protein','cds','host'],
+          desc: 'Tier B: ESM-C + CDS-derived biophysical features (codon, protein properties, disorder). ~10 s warm, ~50 s cold.' },
+  'B+': { url: TIER_B_PLUS_URL, needs: ['protein','cds','host'],
+          desc: 'Tier B+: adds an Evo-2 7B encoding of the 60-nt window around ATG (35 nt upstream + 25 nt downstream), plus RNA-init thermodynamics. ~15 s warm, ~90 s cold.' },
+  C:    { url: TIER_C_URL, needs: ['protein','cds','host'],
+          desc: 'Tier C: adds an Evo-2 7B encoding of the full operon DNA. ~15 s warm, ~90 s cold.' },
+  D:    { url: TIER_D_URL, needs: ['protein','cds','host'],
+          desc: 'Tier D (XP5): all five modalities including Bacformer-large genome context. The paper\'s headline configuration. ~20 s warm, ~90 s cold.' },
+};
+
+/* =========================== EXAMPLES =========================== */
+/* Three scenarios by input configuration. Protein-only shows Tier A flow.
+ * Protein + CDS shows Tier B on the default host. Everything (incl. host
+ * + native mode) shows the paper's champion Tier D recipe. */
+const EXAMPLES = {
+  // Protein only — uses ompA's AA sequence (high-expresser in real life).
+  // Tier A radio: no CDS or host needed.
+  protein_only: {
+    protein: "MKKLTVAALAVTTLLSGSAFAHEAGEFFMRAGSATVRPTEGAGGTLGSLGGFSVTNNTQLGLTFTYMATDNIGVELLAATPFRHKIGTRATGDIATVHHLPPTLMAQWYFGDASSKFRPYVGAGINYTTFFDNGFNDHGKEAGLSDLSLKDSWGAAGQVGVDYLINRDWLVNMSVWYMDIDTTANYKLGGAQQHDSVRLDPWVFMFSAGYRF",
+    cds: "",
+    host: "NC_000913.3", mode: "heterologous", tier: "A",
+  },
+  // Protein + CDS on the default host, heterologous — uses Tier B.
+  // Good demo of pairing a standalone CDS with a host without needing to
+  // match the host's genome exactly.
+  protein_cds: {
+    protein: "MSNLTYLQGYPEQLLSQVRTLINEQRLGDVLAKRYPGTHDYATDKALWQYTQDLKNQFLRNAPPINKVMYDNKIHVLKNALGLHTAVSRVQGGKLKAKVEIRVATVFRNAPEPFLRMIVVHELAHLKEKEHNKAFYQLCCHMEPQYHQLEFDTRLWLTQLSLGQNKI",
+    cds: "ATGAGCAATCTTACTTATCTTCAGGGTTATCCCGAGCAGCTACTTTCCCAGGTGCGAACACTGATTAACGAACAGCGTCTGGGCGATGTGCTGGCAAAACGCTATCCGGGAACACACGACTACGCCACCGATAAAGCCCTCTGGCAATATACTCAGGATCTGAAAAATCAGTTTCTGCGTAATGCCCCGCCGATCAATAAAGTGATGTATGACAATAAGATCCATGTGCTAAAAAACGCGCTCGGGTTACATACCGCTGTTTCTCGTGTGCAGGGCGGCAAGCTGAAAGCAAAGGTGGAGATCCGCGTCGCTACCGTGTTTCGCAACGCGCCGGAACCGTTTTTGCGCATGATCGTGGTGCACGAGCTGGCGCACCTGAAGGAGAAAGAGCATAACAAAGCGTTTTACCAGTTGTGTTGTCATATGGAACCCCAGTACCACCAGCTTGAGTTCGACACCCGACTGTGGCTAACGCAGTTGTCGCTTGGGCAGAACAAAATCTGA",
+    host: "NC_000913.3", mode: "heterologous", tier: "B",
+  },
+  // Full stack: native E. coli hybF (a well-studied hydrogenase-adjacent
+  // gene). All five form fields populated, native mode, Tier D.
+  full: {
+    protein: "MSNLTYLQGYPEQLLSQVRTLINEQRLGDVLAKRYPGTHDYATDKALWQYTQDLKNQFLRNAPPINKVMYDNKIHVLKNALGLHTAVSRVQGGKLKAKVEIRVATVFRNAPEPFLRMIVVHELAHLKEKEHNKAFYQLCCHMEPQYHQLEFDTRLWLTQLSLGQNKI",
+    cds: "ATGAGCAATCTTACTTATCTTCAGGGTTATCCCGAGCAGCTACTTTCCCAGGTGCGAACACTGATTAACGAACAGCGTCTGGGCGATGTGCTGGCAAAACGCTATCCGGGAACACACGACTACGCCACCGATAAAGCCCTCTGGCAATATACTCAGGATCTGAAAAATCAGTTTCTGCGTAATGCCCCGCCGATCAATAAAGTGATGTATGACAATAAGATCCATGTGCTAAAAAACGCGCTCGGGTTACATACCGCTGTTTCTCGTGTGCAGGGCGGCAAGCTGAAAGCAAAGGTGGAGATCCGCGTCGCTACCGTGTTTCGCAACGCGCCGGAACCGTTTTTGCGCATGATCGTGGTGCACGAGCTGGCGCACCTGAAGGAGAAAGAGCATAACAAAGCGTTTTACCAGTTGTGTTGTCATATGGAACCCCAGTACCACCAGCTTGAGTTCGACACCCGACTGTGGCTAACGCAGTTGTCGCTTGGGCAGAACAAAATCTGA",
+    host: "NC_000913.3", mode: "native", tier: "D",
+  },
+};
+
+/* =========================== HOST AUTOCOMPLETE =========================== */
+let HOSTS = [];
+let selectedHost = { acc: "NC_000913.3", name: "Escherichia coli K12" };
+let activeIdx = -1;
+
+const hostInput = document.getElementById('host-input');
+const hostDropdown = document.getElementById('host-dropdown');
+const hostCurrent = document.getElementById('host-current');
+
+async function loadHosts() {
+  try {
+    const r = await fetch('hosts.json');
+    HOSTS = await r.json();
+  } catch (err) {
+    console.error("Couldn't load host manifest:", err);
+    HOSTS = [{ acc: "NC_000913.3", name: "Escherichia coli K12", n: 4098 }];
+  }
+  updateHostStats();
+}
+function updateHostStats() {
+  const total = HOSTS.length;
+  const bulk = HOSTS.filter(h => h.bulk_added).length;
+  const user = HOSTS.filter(h => h.user_added).length;
+  const baseline = total - bulk - user;
+  // Hero stat — compact
+  const hero = document.getElementById('hero-hosts-stat');
+  if (hero) hero.innerHTML = `<strong>${total.toLocaleString()}</strong> host genomes`;
+  // Footer breakdown — detailed
+  const breakdown = document.getElementById('host-cache-breakdown');
+  if (breakdown) {
+    const parts = [
+      `${total.toLocaleString()} hosts`,
+      `${baseline.toLocaleString()} training corpus`,
+      `${bulk.toLocaleString()} extended cache`,
+    ];
+    if (user > 0) parts.push(`${user.toLocaleString()} user-added`);
+    breakdown.textContent = parts.join(' · ');
+  }
+}
+function searchHosts(q) {
+  q = q.trim().toLowerCase();
+  if (!q) return { hits: HOSTS.slice(0, 30), fallback: false };
+  const hits = HOSTS.filter(h =>
+    h.name.toLowerCase().includes(q) || h.acc.toLowerCase().includes(q)
+  ).slice(0, 50);
+  if (hits.length > 0) return { hits, fallback: false };
+  // Fallback: try genus match (first word of query) against host names.
+  const genus = q.split(/\s+/)[0];
+  if (genus.length < 3) return { hits: [], fallback: false };
+  const genusHits = HOSTS.filter(h =>
+    h.name.toLowerCase().split(/[\s_]+/)[0] === genus ||
+    h.name.toLowerCase().startsWith(genus)
+  ).slice(0, 30);
+  return { hits: genusHits, fallback: true };
+}
+function renderDropdown(result) {
+  const list = Array.isArray(result) ? result : result.hits;
+  const fallback = !Array.isArray(result) && result.fallback;
+  if (!list.length) {
+    const q = hostInput.value.trim();
+    hostDropdown.innerHTML =
+      `<div class="host-item" style="color:#6A6A6A;font-style:italic;cursor:default;">
+        No matching host. <a href="#" id="rg-open-link" style="color:var(--champagne);">Request this genome</a> — paste an NCBI accession and we'll fetch it on demand.
+      </div>`;
+    // Clicking the inline link reveals the request-a-genome panel below the dropdown
+    // and prefills the accession field with the user's query (if it looks like one).
+    const openLink = document.getElementById('rg-open-link');
+    if (openLink) {
+      openLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        revealRequestGenomePanel(q);
+      });
+    }
+  } else if (fallback) {
+    const header = `<div class="host-item" style="color:#D4C5A0;font-style:italic;cursor:default;background:rgba(201,169,97,0.05);">
+      No exact match. Closest hosted relatives (genus match):
+    </div>`;
+    hostDropdown.innerHTML = header + list.map((h, i) => {
+      const nTest = h.n_test ? ` · ${h.n_test.toLocaleString()} test genes` : '';
+      return `<div class="host-item${i === activeIdx ? ' active' : ''}" data-acc="${h.acc}" data-name="${h.name}" data-keys='${JSON.stringify(h.species_keys || [])}' data-n-test="${h.n_test || 0}">
+        <span>${h.name}</span>
+        <span class="acc">${h.acc}${nTest}</span>
+      </div>`;
+    }).join('');
+    hostDropdown.querySelectorAll('.host-item[data-acc]').forEach(el => {
+      el.addEventListener('click', () => {
+        const keys = JSON.parse(el.dataset.keys || '[]');
+        const nTest = parseInt(el.dataset.nTest || '0');
+        selectedHost = { acc: el.dataset.acc, name: el.dataset.name,
+                         species_keys: keys, n_test: nTest };
+        hostInput.value = `${el.dataset.name}`;
+        hostCurrent.innerHTML = `Currently: <strong>${el.dataset.name}</strong> (${el.dataset.acc})`;
+        hostDropdown.classList.remove('visible');
+        loadHostScatter();
+        if (typeof detectStale === 'function') detectStale();
+      });
+    });
+    hostDropdown.classList.add('visible');
+    return;
+  } else {
+    hostDropdown.innerHTML = list.map((h, i) => {
+      const nTest = h.n_test ? ` · ${h.n_test.toLocaleString()} test genes` : '';
+      const flag = h.user_added ? ' user-added' : (h.bulk_added ? ' bulk-added' : '');
+      return `<div class="host-item${i === activeIdx ? ' active' : ''}${flag}" data-acc="${h.acc}" data-name="${h.name}" data-keys='${JSON.stringify(h.species_keys || [])}' data-n-test="${h.n_test || 0}">
+        <span>${h.name}</span>
+        <span class="acc">${h.acc}${nTest}</span>
+      </div>`;
+    }).join('');
+    hostDropdown.querySelectorAll('.host-item[data-acc]').forEach(el => {
+      el.addEventListener('click', () => {
+        const keys = JSON.parse(el.dataset.keys || '[]');
+        const nTest = parseInt(el.dataset.nTest || '0');
+        selectedHost = { acc: el.dataset.acc, name: el.dataset.name,
+                         species_keys: keys, n_test: nTest };
+        hostInput.value = `${el.dataset.name}`;
+        hostCurrent.innerHTML = `Currently: <strong>${el.dataset.name}</strong> (${el.dataset.acc})`;
+        hostDropdown.classList.remove('visible');
+        loadHostScatter();
+        if (typeof detectStale === 'function') detectStale();
+      });
+    });
+  }
+  hostDropdown.classList.add('visible');
+}
+
+/* =========================== REQUEST-A-GENOME =========================== */
+const REQUEST_GENOME_URL = 'https://aikium--aikixp-tier-a-landing-page.modal.run/request_genome';
+const GENOME_STATUS_URL  = 'https://aikium--aikixp-tier-a-landing-page.modal.run/genome_status';
+// Loose client-side accession check — the backend is authoritative.
+const ACCESSION_RE = /^(NC_|NZ_|NT_|NW_|CP|CM|AE|AL)[\w.]+$/i;
+
+const rgPanel       = document.getElementById('request-genome-panel');
+const rgAccession   = document.getElementById('rg-accession');
+const rgSubmitBtn   = document.getElementById('rg-submit-btn');
+const rgCompute     = document.getElementById('rg-compute-bacformer');
+const rgStatus      = document.getElementById('rg-status');
+let rgPollHandle = null;
+
+function revealRequestGenomePanel(prefill) {
+  if (!rgPanel) return;
+  rgPanel.style.display = 'block';
+  if (prefill && ACCESSION_RE.test(prefill) && !rgAccession.value) {
+    rgAccession.value = prefill;
+  }
+  rgAccession.focus();
+  rgPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function setRgStatus(text, cls) {
+  if (!rgStatus) return;
+  rgStatus.textContent = text || '';
+  rgStatus.classList.remove('error', 'success');
+  if (cls) rgStatus.classList.add(cls);
+}
+
+async function pollGenomeStatus(acc, attempt) {
+  attempt = attempt || 0;
+  try {
+    const r = await fetch(`${GENOME_STATUS_URL}?acc=${encodeURIComponent(acc)}`);
+    const data = await r.json();
+    if (data.bacformer_status === 'done') {
+      setRgStatus(`Bacformer cache ready for ${acc}. Tier D will respond in ~20 s warm.`, 'success');
+      return;
+    }
+    if (data.bacformer_status === 'failed') {
+      const err = (data.progress && data.progress.error) || 'unknown';
+      setRgStatus(`Bacformer pre-compute failed for ${acc}: ${err}\nTier D will still work — it'll just take 5–30 min on the first request.`, 'error');
+      return;
+    }
+    const phase = (data.progress && data.progress.phase) || data.bacformer_status || 'queued';
+    const n = (data.progress && data.progress.n_proteins) || '?';
+    setRgStatus(`${acc} cached. Bacformer pre-compute ${phase} (${n} proteins)…`, null);
+  } catch (e) {
+    console.warn('genome_status poll failed:', e);
+  }
+  if (attempt < 60) {   // 60 * 15s = 15 min; after that we stop auto-polling
+    rgPollHandle = setTimeout(() => pollGenomeStatus(acc, attempt + 1), 15000);
+  } else {
+    setRgStatus(`${acc} cached. Bacformer pre-compute still running — check back in a bit.`, null);
+  }
+}
+
+async function submitGenomeRequest() {
+  const acc = (rgAccession.value || '').trim();
+  if (!acc) {
+    setRgStatus('Please paste an NCBI accession (e.g. NC_000913.3).', 'error');
+    return;
+  }
+  if (!ACCESSION_RE.test(acc)) {
+    setRgStatus(`"${acc}" does not look like an NCBI chromosome accession. Expected NC_*, NZ_*, CP*, CM*.`, 'error');
+    return;
+  }
+  if (rgPollHandle) { clearTimeout(rgPollHandle); rgPollHandle = null; }
+
+  rgSubmitBtn.disabled = true;
+  setRgStatus(`Fetching ${acc} from NCBI — typically ~15–60 s…`, null);
+
+  try {
+    const resp = await fetch(REQUEST_GENOME_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        accession: acc,
+        compute_bacformer: !!rgCompute.checked,
+      }),
+    });
+    const data = await resp.json();
+
+    if (!resp.ok || data.error) {
+      setRgStatus(`Error: ${data.error || resp.statusText}`, 'error');
+      rgSubmitBtn.disabled = false;
+      return;
+    }
+
+    const warnings = (data.warnings && data.warnings.length)
+      ? '\nWarnings: ' + data.warnings.join(' · ') : '';
+
+    if (data.status === 'already_cached') {
+      setRgStatus(`${data.acc} is already cached (${data.name}, ${data.n_cds} CDS).${warnings}`, 'success');
+    } else if (data.status === 'queued_for_review') {
+      setRgStatus(`${data.acc} queued — ${data.message || ''}`, null);
+    } else {
+      setRgStatus(`Cached ${data.acc} (${data.name}, ${data.n_cds} CDS, ${data.n_pseudo} pseudogenes).${warnings}`, 'success');
+    }
+
+    // Refresh hosts.json so the typeahead picks up the new entry.
+    await loadHosts();
+    // Auto-select the new host if it's now in the list.
+    const host = HOSTS.find(h => h.acc === data.acc);
+    if (host) {
+      selectedHost = {
+        acc: host.acc, name: host.name,
+        species_keys: host.species_keys || [], n_test: host.n_test || 0,
+      };
+      hostInput.value = host.name;
+      hostCurrent.innerHTML = `Currently: <strong>${host.name}</strong> (${host.acc})`;
+      hostDropdown.classList.remove('visible');
+      // species_keys is [] for user-added genomes, so loadHostScatter is a no-op.
+      if (selectedHost.species_keys.length) loadHostScatter();
+    }
+
+    // If Bacformer pre-compute is running, start polling genome_status.
+    if (data.bacformer_status === 'queued') {
+      setRgStatus(`${data.acc} cached. Bacformer pre-compute queued — polling status…`, null);
+      pollGenomeStatus(data.acc, 0);
+    } else if (data.bacformer_status === 'unavailable' && rgCompute.checked) {
+      setRgStatus(`${data.acc} cached, but Bacformer pre-compute could not be spawned. Tier D will run lazily on first request (5–30 min).`, null);
+    }
+  } catch (e) {
+    setRgStatus(`Network error: ${e.message || e}`, 'error');
+  } finally {
+    rgSubmitBtn.disabled = false;
+  }
+}
+
+if (rgSubmitBtn) rgSubmitBtn.addEventListener('click', submitGenomeRequest);
+if (rgAccession) {
+  rgAccession.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); submitGenomeRequest(); }
+  });
+}
+hostInput.addEventListener('focus', () => renderDropdown(searchHosts(hostInput.value)));
+hostInput.addEventListener('input', () => { activeIdx = -1; renderDropdown(searchHosts(hostInput.value)); });
+hostInput.addEventListener('keydown', (e) => {
+  const items = hostDropdown.querySelectorAll('.host-item[data-acc]');
+  if (e.key === 'ArrowDown') { e.preventDefault(); activeIdx = Math.min(activeIdx + 1, items.length - 1); items.forEach((el,i) => el.classList.toggle('active', i === activeIdx)); items[activeIdx]?.scrollIntoView({block:'nearest'}); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); activeIdx = Math.max(activeIdx - 1, 0); items.forEach((el,i) => el.classList.toggle('active', i === activeIdx)); }
+  else if (e.key === 'Enter' && activeIdx >= 0) { e.preventDefault(); items[activeIdx].click(); }
+  else if (e.key === 'Escape') { hostDropdown.classList.remove('visible'); }
+});
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.host-search')) hostDropdown.classList.remove('visible');
+});
+
+/* =========================== EXAMPLES =========================== */
+document.querySelectorAll('.example-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const ex = EXAMPLES[btn.dataset.ex];
+    if (!ex) return; // autofill-cds-btn and find-host-btn have no data-ex
+    document.getElementById('protein').value = ex.protein;
+    document.getElementById('cds').value = ex.cds || '';
+    const host = HOSTS.find(h => h.acc === ex.host);
+    if (host) {
+      selectedHost = { acc: host.acc, name: host.name,
+                       species_keys: host.species_keys || [],
+                       n_test: host.n_test || 0 };
+      hostInput.value = '';
+      hostCurrent.innerHTML = `Currently: <strong>${host.name}</strong> (${host.acc})`;
+      loadHostScatter();
+    }
+    const modeRadio = document.querySelector(`input[name="mode"][value="${ex.mode}"]`);
+    if (modeRadio) modeRadio.checked = true;
+    if (ex.tier) {
+      const tierRadio = document.querySelector(`input[name="tier"][value="${ex.tier}"]`);
+      if (tierRadio) { tierRadio.checked = true; updateTierVisibility(); }
+    }
+    document.getElementById('protein').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+});
+
+/* Reproduce-paper-numbers button removed — full reproduction belongs in the
+ * Colab notebook (n=244K), not a noisy n=500 landing-page sample. The
+ * SAMPLE_LOOKUP_URL + ranks / spearman / perFoldRho helpers below are
+ * kept because they're used by the /sample_lookup endpoint's programmatic
+ * callers and may be reused later. */
+
+/** rank array (Wikipedia 'average rank' for ties, inlined). */
+function ranks(arr) {
+  const n = arr.length;
+  const idx = Array.from({length: n}, (_, i) => i).sort((a, b) => arr[a] - arr[b]);
+  const rk = new Array(n);
+  let i = 0;
+  while (i < n) {
+    let j = i;
+    while (j + 1 < n && arr[idx[j+1]] === arr[idx[i]]) j++;
+    const avg = (i + j) / 2 + 1;
+    for (let k = i; k <= j; k++) rk[idx[k]] = avg;
+    i = j + 1;
+  }
+  return rk;
+}
+
+function spearman(xs, ys) {
+  if (xs.length !== ys.length || xs.length < 2) return null;
+  const rx = ranks(xs);
+  const ry = ranks(ys);
+  const n = xs.length;
+  const mx = rx.reduce((a, b) => a + b, 0) / n;
+  const my = ry.reduce((a, b) => a + b, 0) / n;
+  let num = 0, dx2 = 0, dy2 = 0;
+  for (let i = 0; i < n; i++) {
+    const a = rx[i] - mx, b = ry[i] - my;
+    num += a * b; dx2 += a * a; dy2 += b * b;
+  }
+  return num / Math.sqrt(dx2 * dy2);
+}
+
+function perFoldRho(rows, predKey) {
+  const byFold = {};
+  rows.forEach(r => { (byFold[r.cv_fold] ||= []).push(r); });
+  const rhos = [];
+  for (const f of Object.keys(byFold).sort()) {
+    const g = byFold[f];
+    if (g.length < 2) continue;
+    const rho = spearman(g.map(r => r.true_expression), g.map(r => r[predKey]));
+    if (rho != null) rhos.push(rho);
+  }
+  if (!rhos.length) return { mean: null, sd: null, n_folds: 0 };
+  const mean = rhos.reduce((a, b) => a + b, 0) / rhos.length;
+  const varv = rhos.reduce((a, b) => a + (b - mean) ** 2, 0) / rhos.length;
+  return { mean, sd: Math.sqrt(varv), n_folds: rhos.length };
+}
+
+/* reproduce-paper-numbers click handler removed along with the section —
+ * see the .compute-footnote paragraph above, which points readers at the
+ * Colab notebook for a proper full-corpus reproduction (n=244K, noise
+ * well below the paper's ±0.012 band). */
+
+/* =========================== HOST SCATTER =========================== */
+const HOST_SCATTER_URL   = 'https://aikium--aikixp-tier-a-landing-page.modal.run/species_scatter';
+const FIND_IN_CORPUS_URL = 'https://aikium--aikixp-tier-a-landing-page.modal.run/find_in_corpus';
+const FIND_NEIGHBORS_URL = 'https://aikium--aikixp-tier-a-landing-page.modal.run/find_neighbors';
+const UMAP_LANDSCAPE_URL = 'https://aikium--aikixp-tier-a-landing-page.modal.run/umap_landscape';
+const UMAP_PROJECT_URL = 'https://aikium--aikixp-tier-a-landing-page.modal.run/umap_project';
+const EMBED_PROTEIN_URL = 'https://aikium--aikixp-tier-a-landing-page.modal.run/embed_protein';
+const FOLD_STRUCTURE_URL = 'https://aikium--aikixp-tier-a-landing-page.modal.run/fold_structure';
+
+function plddtColor(pct /* 0-100 */) {
+  if (pct >= 90) return '#2E9EE0';  // very high — deep blue
+  if (pct >= 70) return '#7FC99B';  // confident — green
+  if (pct >= 50) return '#E8C14D';  // low — amber
+  return '#E8732D';                  // very low — orange
+}
+
+function renderStructure(pdbText, meanPLDDT) {
+  const viewerEl = document.getElementById('structure-viewer');
+  viewerEl.innerHTML = '';
+  viewerEl.style.display = 'block';
+  const viewer = $3Dmol.createViewer('structure-viewer', {
+    backgroundColor: 'rgba(10,10,10,0)',
+  });
+  viewer.addModel(pdbText, 'pdb');
+  // Colour by pLDDT (stored in B-factor; 0-1 scale from ESMFold Atlas)
+  viewer.setStyle({}, {
+    cartoon: {
+      colorfunc: function (atom) {
+        // atom.b is the B-factor as stored in the PDB; here it's pLDDT on 0-1 scale
+        const p = (atom.b || 0) * 100;
+        return plddtColor(p);
+      },
+    },
+  });
+  viewer.zoomTo();
+  viewer.render();
+  viewer.zoom(1.1, 600);
+  // Re-render on window resize
+  window.addEventListener('resize', () => {
+    viewer.resize();
+    viewer.render();
+  }, { once: true });
+}
+
+async function foldCurrentProtein() {
+  const btn = document.getElementById('structure-btn');
+  const status = document.getElementById('structure-status');
+  const protein = (document.getElementById('protein').value || '').trim().replace(/\s/g, '');
+  if (!protein.match(/^[ACDEFGHIKLMNPQRSTVWY]+$/i)) {
+    status.textContent = 'Paste a protein sequence first.';
+    status.style.color = '#EF4444';
+    return;
+  }
+  if (protein.length > 400) {
+    status.textContent = `Sequence is ${protein.length} aa; ESMFold Atlas caps at 400 aa. For longer proteins use the Docker image or email partnerships@aikium.com.`;
+    status.style.color = '#EF4444';
+    return;
+  }
+  btn.disabled = true;
+  status.style.color = 'var(--champagne)';
+  status.textContent = `Folding ${protein.length} aa via ESMFold Atlas…`;
+  const t0 = performance.now();
+  try {
+    const resp = await fetch(FOLD_STRUCTURE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ protein }),
+    });
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error);
+    const dt = ((performance.now() - t0) / 1000).toFixed(1);
+    const mean = data.pLDDT_mean;
+    const conf = mean >= 90 ? 'very high' : mean >= 70 ? 'confident' : mean >= 50 ? 'low' : 'very low';
+    status.innerHTML = `<strong>${data.length} aa</strong> · mean pLDDT <strong>${mean.toFixed(1)}</strong> (${conf} confidence) · ${dt}s · source: ${data.source_used}`;
+    renderStructure(data.pdb, mean);
+  } catch (err) {
+    status.textContent = 'Structure prediction failed: ' + err.message;
+    status.style.color = '#EF4444';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+document.getElementById('structure-btn').addEventListener('click', foldCurrentProtein);
+
+// Cache the loaded background per modality (each ~40K points, ~7 MB)
+const _umapBgCache = {};
+// Latest successful projection result — re-rendered when user switches modality
+let _umapLastProjection = null;
+
+async function loadUmapBackground(modality) {
+  if (_umapBgCache[modality]) return _umapBgCache[modality];
+  const resp = await fetch(`${UMAP_LANDSCAPE_URL}?modality=${modality}`);
+  if (!resp.ok) throw new Error(`umap_landscape ${resp.status}`);
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  _umapBgCache[modality] = data;
+  return data;
+}
+
+function renderUmap(modality, bg, projection) {
+  // Split background into test (coloured by tier_d) and train (grey)
+  const testPts = bg.points.filter(p => p.is_test);
+  const trainPts = bg.points.filter(p => !p.is_test);
+
+  const traces = [
+    {
+      type: 'scattergl', mode: 'markers',
+      name: `training split (n=${trainPts.length.toLocaleString()})`,
+      x: trainPts.map(p => p.x),
+      y: trainPts.map(p => p.y),
+      marker: { size: 3, color: 'rgba(180,180,180,0.18)' },
+      hoverinfo: 'skip',
+      showlegend: true,
+    },
+    {
+      type: 'scattergl', mode: 'markers',
+      name: `test split · coloured by Tier D CV (n=${testPts.length.toLocaleString()})`,
+      x: testPts.map(p => p.x),
+      y: testPts.map(p => p.y),
+      marker: {
+        size: 4,
+        color: testPts.map(p => p.tier_d),
+        colorscale: [[0, '#1E4A8A'], [0.5, '#999999'], [1, '#C9A961']],
+        cmin: -2, cmax: 2,
+        colorbar: {
+          title: { text: 'Tier D z', side: 'right' },
+          thickness: 10, len: 0.6, tickfont: { color: '#FAFAF8', size: 10 },
+          titlefont: { color: '#FAFAF8', size: 11 },
+        },
+        opacity: 0.75,
+      },
+      text: testPts.map(p => `${p.gene_id}<br>${p.species}<br>Tier D: ${p.tier_d != null ? p.tier_d.toFixed(2) : '-'}<br>truth: ${p.truth != null ? p.truth.toFixed(2) : '-'}`),
+      hovertemplate: '%{text}<extra></extra>',
+    },
+  ];
+
+  // Neighbours and user's inferred position
+  if (projection && projection.centroid && projection.centroid[modality]) {
+    const nbs = (projection.neighbors || [])
+      .filter(n => n[`${modality}_x`] != null && n[`${modality}_y`] != null);
+    if (nbs.length) {
+      traces.push({
+        type: 'scattergl', mode: 'markers',
+        name: `your ${nbs.length} nearest neighbours`,
+        x: nbs.map(n => n[`${modality}_x`]),
+        y: nbs.map(n => n[`${modality}_y`]),
+        marker: { size: 10, color: 'rgba(250,250,248,0)', line: { color: '#FAFAF8', width: 1.5 } },
+        text: nbs.map(n => `${n.gene_id}<br>similarity: ${n.similarity.toFixed(3)}`),
+        hovertemplate: '%{text}<extra></extra>',
+      });
+    }
+    const [cx, cy] = projection.centroid[modality];
+    traces.push({
+      type: 'scattergl', mode: 'markers',
+      name: 'your protein (inferred)',
+      x: [cx], y: [cy],
+      marker: { size: 18, color: '#C9A961', symbol: 'star', line: { color: '#FAFAF8', width: 2 } },
+      text: ['your protein (inferred from K-NN centroid)'],
+      hovertemplate: '%{text}<extra></extra>',
+    });
+  }
+
+  Plotly.newPlot('umap-chart', traces, {
+    paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(10,10,10,0.3)',
+    font: { family: 'Inter, sans-serif', color: '#FAFAF8', size: 11 },
+    xaxis: { title: 'UMAP-x', gridcolor: 'rgba(201,169,97,0.06)', zerolinecolor: 'rgba(201,169,97,0.2)' },
+    yaxis: { title: 'UMAP-y', gridcolor: 'rgba(201,169,97,0.06)', zerolinecolor: 'rgba(201,169,97,0.2)' },
+    margin: { l: 55, r: 20, t: 20, b: 45 },
+    legend: { bgcolor: 'rgba(26,26,26,0.7)', bordercolor: 'rgba(201, 169, 97, 0.2)', x: 0.01, y: 0.99 },
+    height: 460,
+    hovermode: 'closest',
+  }, { displayModeBar: false, responsive: true });
+}
+
+async function showUmapViaEmbedding(protein) {
+  const umapPanel = document.getElementById('umap-panel');
+  const status = document.getElementById('umap-status');
+  if (!umapPanel) return;
+  umapPanel.style.display = 'block';
+  status.textContent = 'Computing ESM-C embedding for your protein (≈5-10 s warm, up to 60 s cold)…';
+  try {
+    const resp = await fetch(EMBED_PROTEIN_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ protein }),
+    });
+    const data = await resp.json();
+    if (data.error) {
+      status.textContent = 'Embedding failed: ' + data.error;
+      _umapLastProjection = null;
+      const modSel = document.getElementById('umap-modality');
+      const bg = await loadUmapBackground(modSel.value);
+      renderUmap(modSel.value, bg, null);
+      return;
+    }
+    await showUmap({ embedding: data.esmc_pca128 });
+  } catch (err) {
+    status.textContent = 'Embedding call error: ' + err.message;
+  }
+}
+
+async function showUmap(geneIdOrEmbedding) {
+  const umapPanel = document.getElementById('umap-panel');
+  const status = document.getElementById('umap-status');
+  const modSel = document.getElementById('umap-modality');
+  if (!umapPanel) return;
+  umapPanel.style.display = 'block';
+  status.textContent = 'Loading 40K-gene background…';
+  try {
+    const modality = modSel.value;
+    const bg = await loadUmapBackground(modality);
+    // Fire projection if we have a query identifier
+    if (geneIdOrEmbedding) {
+      status.textContent = 'Projecting your protein via 10 nearest neighbours…';
+      const projResp = await fetch(UMAP_PROJECT_URL, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...geneIdOrEmbedding, k: 10 }),
+      });
+      const proj = await projResp.json();
+      if (proj.error) {
+        status.textContent = 'Projection skipped: ' + proj.error;
+        _umapLastProjection = null;
+      } else {
+        _umapLastProjection = proj;
+        status.textContent = `Projected — ${proj.k_returned} neighbours; centroid is an inferred position, not an exact UMAP transform.`;
+      }
+    } else {
+      _umapLastProjection = null;
+      status.textContent = 'Showing corpus only — no user protein to overlay.';
+    }
+    renderUmap(modality, bg, _umapLastProjection);
+  } catch (err) {
+    status.textContent = 'Error: ' + err.message;
+  }
+}
+
+// Re-render when the modality dropdown changes — reuse last projection
+document.getElementById('umap-modality').addEventListener('change', async () => {
+  const modSel = document.getElementById('umap-modality');
+  const status = document.getElementById('umap-status');
+  status.textContent = 'Loading background…';
+  try {
+    const bg = await loadUmapBackground(modSel.value);
+    renderUmap(modSel.value, bg, _umapLastProjection);
+    status.textContent = _umapLastProjection
+      ? 'Switched to ' + modSel.value + '.'
+      : 'Showing ' + modSel.value + ' — no projection to overlay.';
+  } catch (err) {
+    status.textContent = 'Error: ' + err.message;
+  }
+});
+
+const MODALITY_PRETTY = {
+  evo2_7b_full_operon_pca4096: 'Evo-2 full operon',
+  hyenadna_dna_cds:             'HyenaDNA CDS',
+  esmc_protein:                 'ESM-C protein',
+  bacformer_large:              'Bacformer genome',
+  classical_codon:              'Classical codon',
+  classical_protein:            'Classical protein',
+  classical_disorder:           'Classical disorder',
+  classical_operon_struct:      'Classical operon struct.',
+  classical_rna_init:           'Classical RNA init',
+};
+
+function renderAttribution(attrDict, totalZ) {
+  const block = document.getElementById('dissect-attribution-block');
+  const narrative = document.getElementById('attribution-narrative');
+  if (!block) return;
+  // Group the 5 classical_* biophysical features into a single "Classical
+  // biophysics" unit — they're design-time features (GC, disorder, pI, RNA
+  // init, operon structure) that together form ONE modality in XP5's
+  // 5-modality view (protein + DNA + classical + operon + genome).
+  const grouped = {};
+  let classicalSum = 0;
+  let classicalCount = 0;
+  for (const [k, v] of Object.entries(attrDict)) {
+    if (k.startsWith('classical_')) {
+      classicalSum += Number(v);
+      classicalCount++;
+    } else {
+      grouped[k] = Number(v);
+    }
+  }
+  if (classicalCount > 0) grouped.classical_biophysics = classicalSum;
+  const PRETTY_WITH_GROUP = { ...MODALITY_PRETTY, classical_biophysics: 'Classical biophysics' };
+  // Sort modalities by absolute magnitude, descending
+  const entries = Object.entries(grouped)
+    .map(([k, v]) => [k, Number(v)])
+    .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
+  if (entries.length === 0) { block.style.display = 'none'; return; }
+
+  const labels = entries.map(([k, _]) => PRETTY_WITH_GROUP[k] || k);
+  const values = entries.map(([_, v]) => v);
+  const colors = values.map(v => v >= 0 ? '#C9A961' : '#1E4A8A');
+
+  Plotly.newPlot('attribution-chart', [{
+    type: 'bar', orientation: 'h',
+    x: values, y: labels,
+    marker: { color: colors, line: { color: '#FAFAF8', width: 0.5 } },
+    text: values.map(v => (v >= 0 ? '+' : '') + v.toFixed(3)),
+    textposition: 'outside', textfont: { color: '#FAFAF8' },
+    hovertemplate: '%{y}: %{x:+.3f}<extra></extra>',
+  }], {
+    paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+    font: { family: 'Inter, sans-serif', color: '#FAFAF8', size: 12 },
+    xaxis: { title: 'Δ z-score if modality zero-filled',
+             gridcolor: 'rgba(201,169,97,0.08)',
+             zerolinecolor: 'rgba(201,169,97,0.3)' },
+    yaxis: { autorange: 'reversed' },
+    margin: { l: 170, r: 50, t: 10, b: 50 },
+    height: 40 + 34 * entries.length,
+  }, { displayModeBar: false, responsive: true });
+
+  // Sentence summary naming the top driver
+  const top = entries[0];
+  if (top && narrative) {
+    const dir = top[1] >= 0 ? 'raised' : 'lowered';
+    const name = PRETTY_WITH_GROUP[top[0]] || top[0];
+    const classicalNote = classicalCount > 0
+      ? ` Classical biophysics is shown as one unit (sum of GC, codon usage, disorder, RNA init, and operon structure).`
+      : '';
+    narrative.innerHTML =
+      `Each bar: how much the final Tier D z would <em>change</em> if that modality were zero-filled. ` +
+      `The strongest driver here is <strong>${name}</strong> (${top[1] >= 0 ? '+' : ''}${top[1].toFixed(3)}), which ${dir} the prediction.` +
+      classicalNote +
+      ` Final Tier D z = ${totalZ >= 0 ? '+' : ''}${totalZ.toFixed(3)}.`;
+  }
+  block.style.display = 'block';
+}
+
+/* =========================== DISSECT PANEL ========================= */
+// Training-set reference distribution for the 492K corpus (bacterial proteins).
+// Values are approximations from the paper's Methods + QC audits. Purpose: flag
+// out-of-distribution features, not to be statistically exact.
+const DISSECT_REF = {
+  length:           { median: 290, p5: 60,   p95: 900,  label: 'residues' },
+  pI:               { median: 6.8, p5: 4.5,  p95: 10.5, label: 'pI' },
+  pct_hydrophobic:  { median: 40,  p5: 30,   p95: 55,   label: '% hydrophobic' },
+  pct_charged:      { median: 24,  p5: 15,   p95: 33,   label: '% charged (D/E/K/R)' },
+  gravy:            { median: -0.1,p5: -0.8, p95: 0.6,  label: 'GRAVY (hydropathy)' },
+  gc:               { median: 52,  p5: 32,   p95: 71,   label: '% GC (CDS)' },
+};
+
+// Kyte-Doolittle hydropathy scores
+const KD = {A: 1.8, R: -4.5, N: -3.5, D: -3.5, C: 2.5, E: -3.5, Q: -3.5, G: -0.4,
+  H: -3.2, I: 4.5, L: 3.8, K: -3.9, M: 1.9, F: 2.8, P: -1.6, S: -0.8, T: -0.7,
+  W: -0.9, Y: -1.3, V: 4.2};
+
+// Approximate monoisotopic residue masses (Da)
+const AA_MASS = {A:71.079,R:156.19,N:114.104,D:115.088,C:103.144,E:129.116,Q:128.131,
+  G:57.052,H:137.142,I:113.16,L:113.16,K:128.17,M:131.197,F:147.177,P:97.117,
+  S:87.078,T:101.105,W:186.213,Y:163.176,V:99.133};
+
+// Iterative pI calculation (EMBOSS-style; not identical but close enough)
+function estimatePI(seq) {
+  const pKa = { Cterm:3.65, Nterm:8.2, C:8.5, D:3.9, E:4.07, H:6.04, K:10.54, R:12.48, Y:10.46 };
+  const counts = {C:0,D:0,E:0,H:0,K:0,R:0,Y:0};
+  for (const r of seq) if (counts[r] !== undefined) counts[r]++;
+  function chargeAt(pH) {
+    const pos = 1/(1+Math.pow(10,pH-pKa.Nterm))
+              + counts.H*(1/(1+Math.pow(10,pH-pKa.H)))
+              + counts.K*(1/(1+Math.pow(10,pH-pKa.K)))
+              + counts.R*(1/(1+Math.pow(10,pH-pKa.R)));
+    const neg = 1/(1+Math.pow(10,pKa.Cterm-pH))
+              + counts.C*(1/(1+Math.pow(10,pKa.C-pH)))
+              + counts.D*(1/(1+Math.pow(10,pKa.D-pH)))
+              + counts.E*(1/(1+Math.pow(10,pKa.E-pH)))
+              + counts.Y*(1/(1+Math.pow(10,pKa.Y-pH)));
+    return pos - neg;
+  }
+  let lo = 0, hi = 14;
+  for (let i = 0; i < 50; i++) {
+    const mid = (lo + hi) / 2;
+    const q = chargeAt(mid);
+    if (q > 0) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+function computeBiophysics(protein, cds) {
+  if (!protein) return null;
+  const seq = protein.toUpperCase();
+  const n = seq.length;
+  let hydro = 0, charged = 0, gravy = 0, mw = 18.015;   // +H2O
+  for (const r of seq) {
+    if ('AILMFWVCY'.includes(r)) hydro++;
+    if ('DEKR'.includes(r)) charged++;
+    if (KD[r] !== undefined) gravy += KD[r];
+    if (AA_MASS[r] !== undefined) mw += AA_MASS[r];
+  }
+  const out = {
+    length: n,
+    pct_hydrophobic: 100 * hydro / n,
+    pct_charged:     100 * charged / n,
+    gravy:           gravy / n,
+    mw_kda:          mw / 1000,
+    pI:              estimatePI(seq),
+  };
+  if (cds && cds.length > 0) {
+    const cdsU = cds.toUpperCase().replace(/U/g,'T');
+    let gc = 0;
+    for (const b of cdsU) if (b === 'G' || b === 'C') gc++;
+    out.cds_len  = cdsU.length;
+    out.gc       = 100 * gc / cdsU.length;
+    out.start_ok = cdsU.startsWith('ATG');
+    out.stop_ok  = ['TAA','TAG','TGA'].includes(cdsU.slice(-3));
+  }
+  return out;
+}
+
+function zScoreAgainstRef(value, refKey) {
+  const ref = DISSECT_REF[refKey];
+  if (!ref || value == null) return null;
+  // Approximate SD from (p95 - p5) / 3.29 (normal assumption)
+  const sd = (ref.p95 - ref.p5) / 3.29;
+  return (value - ref.median) / sd;
+}
+
+function oodSummary(feats) {
+  if (!feats) return [];
+  const flags = [];
+  const checks = [
+    ['length', 'length', 'residues'],
+    ['pI', 'pI', ''],
+    ['pct_hydrophobic', '% hydrophobic', '%'],
+    ['pct_charged', '% charged', '%'],
+    ['gravy', 'GRAVY', ''],
+  ];
+  if (feats.gc !== undefined) checks.push(['gc', '% GC', '%']);
+  for (const [key, label] of checks) {
+    const z = zScoreAgainstRef(feats[key], key);
+    if (z == null) continue;
+    if (Math.abs(z) > 2) {
+      const dir = z > 0 ? 'higher' : 'lower';
+      flags.push(`${label} is ${Math.abs(z).toFixed(1)} SD ${dir} than the training median — Aiki-XP may be extrapolating on this axis.`);
+    }
+  }
+  return flags;
+}
+
+function reliabilityFromNeighbors(neighbors) {
+  if (!neighbors || neighbors.length === 0) return null;
+  const sims = neighbors.map(n => n.similarity).sort((a,b) => b-a);
+  const top = sims[0], mean = sims.reduce((s,v)=>s+v,0)/sims.length;
+  let bucket = 'unreliable', cls = 'reliability-unreliable';
+  if      (top >= 0.95) { bucket = 'very high'; cls = 'reliability-very-high'; }
+  else if (top >= 0.85) { bucket = 'high';      cls = 'reliability-high'; }
+  else if (top >= 0.70) { bucket = 'medium';    cls = 'reliability-medium'; }
+  else if (top >= 0.55) { bucket = 'low';       cls = 'reliability-low'; }
+  return { bucket, cls, top, mean, n: sims.length };
+}
+
+function renderDissect(tier, predictionZ, protein, cds, neighbors, host) {
+  const panel = document.getElementById('dissect-panel');
+  if (!panel) return;
+  panel.style.display = 'block';
+
+  // --- Confidence / reliability ---
+  const confRow = document.getElementById('dissect-confidence-row');
+  const calibRow = document.getElementById('dissect-calibration-row');
+  const rel = reliabilityFromNeighbors(neighbors);
+  if (rel) {
+    confRow.innerHTML = `<span class="reliability-bucket ${rel.cls}">${rel.bucket}</span>` +
+      `Top neighbour cosine <strong>${rel.top.toFixed(3)}</strong>, mean of ${rel.n} <strong>${rel.mean.toFixed(3)}</strong>. ` +
+      (rel.bucket === 'very high' ? 'Your protein has a near-duplicate in the training corpus; the prediction is likely reliable.' :
+       rel.bucket === 'high' ? 'Your protein has close homologues in the training corpus.' :
+       rel.bucket === 'medium' ? 'Some homologues in the corpus but none very close; prediction should be treated as approximate.' :
+       rel.bucket === 'low' ? 'Few or distant homologues — prediction is extrapolating.' :
+       'No close homologues found — prediction is an extrapolation and should not be trusted as a point estimate.');
+  } else {
+    confRow.textContent = 'No neighbours available (Tier A predictions don\'t trigger the K-NN search).';
+  }
+
+  // Paper's per-point MAE (non-mega): 0.47 z; 95% within 1.5 z.
+  if (predictionZ != null) {
+    const lo1 = predictionZ - 0.47, hi1 = predictionZ + 0.47;
+    calibRow.innerHTML = `Calibration band: <strong>${predictionZ.toFixed(2)}</strong> &plusmn; 0.47 z ` +
+      `(paper's MAE on non-conserved genes). ~50% of the density sits in [${lo1.toFixed(2)}, ${hi1.toFixed(2)}]; ` +
+      `~95% within &plusmn;1.5 z.`;
+  }
+
+  // --- Biophysics ---
+  const tbody = document.getElementById('dissect-biophys-tbody');
+  tbody.innerHTML = '';
+  const feats = computeBiophysics(protein, cds);
+  if (feats) {
+    const rows = [
+      ['Length',          `${feats.length} residues`],
+      ['Molecular weight',`${feats.mw_kda.toFixed(1)} kDa`],
+      ['Estimated pI',    feats.pI.toFixed(2)],
+      ['% hydrophobic',   feats.pct_hydrophobic.toFixed(1) + '%'],
+      ['% charged (D/E/K/R)', feats.pct_charged.toFixed(1) + '%'],
+      ['GRAVY (Kyte-Doolittle)', feats.gravy.toFixed(2)],
+    ];
+    if (feats.cds_len !== undefined) {
+      rows.push(['CDS length',        `${feats.cds_len} nt`]);
+      rows.push(['% GC (CDS)',        feats.gc.toFixed(1) + '%']);
+      rows.push(['Start codon (ATG)', feats.start_ok ? 'yes' : 'no — missing ATG at start']);
+      rows.push(['Stop codon',        feats.stop_ok  ? 'yes' : 'no — missing TAA/TAG/TGA at end']);
+    }
+    for (const [k, v] of rows) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${k}</td><td>${v}</td>`;
+      tbody.appendChild(tr);
+    }
+  }
+
+  // --- Out-of-distribution flags ---
+  const oodRow = document.getElementById('dissect-ood-row');
+  const flags = oodSummary(feats);
+  if (flags.length === 0) {
+    oodRow.innerHTML = '<span style="color:#7FC99B;">✓</span> Your protein is within the training distribution on all ' +
+      (feats && feats.gc !== undefined ? 'six' : 'five') + ' axes we checked.';
+  } else {
+    oodRow.innerHTML = flags.map(f => `<div>⚠ ${f}</div>`).join('');
+  }
+}
+
+async function renderNeighbors(geneId) {
+  const panel = document.getElementById('neighbors-panel');
+  const tbody = document.getElementById('neighbors-tbody');
+  if (!panel || !tbody) return null;
+  try {
+    const resp = await fetch(FIND_NEIGHBORS_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ gene_id: geneId, k: 5 }),
+    });
+    const data = await resp.json();
+    if (data.error || !Array.isArray(data.hits) || data.hits.length === 0) {
+      panel.style.display = 'none';
+      return null;
+    }
+    tbody.innerHTML = '';
+    for (const h of data.hits) {
+      const gidShort = h.gene_id.split('|').pop();
+      const truth = h.true_expression;
+      const tierD = h.tier_d_prediction;
+      const truthStr = truth == null ? '—' : `${truth >= 0 ? '+' : ''}${truth.toFixed(3)}`;
+      const tierDStr = tierD == null ? '—' : `${tierD >= 0 ? '+' : ''}${tierD.toFixed(3)}`;
+      const truthCls = truth == null ? '' : (truth >= 0.5 ? 'score-high' : truth <= -0.5 ? 'score-low' : 'score-mid');
+      const tierDCls = tierD == null ? '' : (tierD >= 0.5 ? 'score-high' : tierD <= -0.5 ? 'score-low' : 'score-mid');
+      tbody.insertAdjacentHTML('beforeend',
+        `<tr>
+           <td title="${h.gene_id}">${gidShort}</td>
+           <td style="font-size:0.82rem;opacity:0.8;">${h.species || '—'}</td>
+           <td><span class="rank-pill">${h.similarity.toFixed(3)}</span></td>
+           <td class="${truthCls}">${truthStr}</td>
+           <td class="${tierDCls}">${tierDStr}</td>
+         </tr>`);
+    }
+    panel.style.display = 'block';
+    return data.hits;
+  } catch (err) {
+    console.warn('find_neighbors failed:', err);
+    panel.style.display = 'none';
+    return null;
+  }
+}
+let currentScatterData = null;    // last loaded {points, rho, ...}
+let currentScatterHost = null;    // acc for cache-keying
+
+const scatterPanel = document.getElementById('host-scatter-panel');
+const scatterDiv   = document.getElementById('host-scatter');
+
+async function loadHostScatter() {
+  if (!selectedHost?.species_keys?.length || !selectedHost.n_test) {
+    scatterPanel.style.display = 'none';
+    currentScatterData = null;
+    return;
+  }
+  if (currentScatterHost === selectedHost.acc && currentScatterData) {
+    renderScatter();
+    return;
+  }
+  scatterPanel.style.display = 'block';
+  document.getElementById('hs-host').textContent = selectedHost.name;
+  document.getElementById('hs-n').textContent = `loading...`;
+  document.getElementById('hs-rho').textContent = '—';
+  document.getElementById('hs-rho-nm').textContent = '—';
+  scatterDiv.innerHTML = '<p style="padding:40px;text-align:center;color:#6A6A6A;">Loading scatter data for ' + selectedHost.name + '...</p>';
+  try {
+    const resp = await fetch(HOST_SCATTER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ species_keys: selectedHost.species_keys }),
+    });
+    const data = await resp.json();
+    if (data.error || !data.points?.length) {
+      scatterPanel.style.display = 'none';
+      return;
+    }
+    currentScatterHost = selectedHost.acc;
+    currentScatterData = data;
+    document.getElementById('hs-n').textContent = `${data.n.toLocaleString()} total · ${data.n_nonmega.toLocaleString()} non-mega`;
+    document.getElementById('hs-rho').textContent = data.rho_overall != null ? data.rho_overall.toFixed(3) : '—';
+    document.getElementById('hs-rho-nm').textContent = data.rho_nonmega != null ? data.rho_nonmega.toFixed(3) : '—';
+    renderScatter();
+  } catch (err) {
+    console.warn('scatter fetch failed:', err);
+    scatterPanel.style.display = 'none';
+  }
+}
+
+function renderScatter(userPred = null, corpusMatch = null) {
+  if (!currentScatterData) return;
+  const pts = currentScatterData.points;
+  const nmPts = pts.filter(p => !p.is_mega);
+  const mPts  = pts.filter(p =>  p.is_mega);
+
+  const traces = [
+    {
+      x: nmPts.map(p => p.true), y: nmPts.map(p => p.tier_d), mode: 'markers', type: 'scattergl',
+      name: `non-mega (n=${nmPts.length})`,
+      marker: { size: 5, color: 'rgba(30, 74, 138, 0.65)', line: { width: 0 } },
+      text: nmPts.map(p => p.gene_id), hovertemplate: '%{text}<br>truth=%{x:.2f}<br>Tier D CV=%{y:.2f}<extra></extra>',
+    },
+    {
+      x: mPts.map(p => p.true), y: mPts.map(p => p.tier_d), mode: 'markers', type: 'scattergl',
+      name: `mega (n=${mPts.length})`,
+      marker: { size: 5, color: 'rgba(201, 169, 97, 0.55)', line: { width: 0 } },
+      text: mPts.map(p => p.gene_id), hovertemplate: '%{text}<br>truth=%{x:.2f}<br>Tier D CV=%{y:.2f}<extra></extra>',
+    },
+    {
+      x: [-4, 4], y: [-4, 4], mode: 'lines',
+      line: { color: 'rgba(250, 250, 248, 0.25)', dash: 'dash', width: 1.5 },
+      name: 'y = x (perfect)', hoverinfo: 'skip',
+    },
+  ];
+
+  if (corpusMatch) {
+    traces.push({
+      x: [corpusMatch.truth], y: [corpusMatch.tier_d_cv], mode: 'markers+text',
+      marker: { size: 14, symbol: 'star', color: '#22C55E', line: { width: 1.5, color: '#FAFAF8' } },
+      name: 'Matched gene (held-out CV)',
+      text: [corpusMatch.protein_id], textposition: 'top right',
+      textfont: { family: 'JetBrains Mono, monospace', size: 10, color: '#86EFAC' },
+      hovertemplate: `${corpusMatch.gene_id}<br>truth=%{x:.3f}<br>CV pred=%{y:.3f}<extra></extra>`,
+    });
+  }
+
+  if (userPred != null) {
+    traces.push({
+      x: [-4, 4], y: [userPred, userPred], mode: 'lines',
+      line: { color: '#C9A961', dash: 'dot', width: 2 },
+      name: `your prediction (${userPred >= 0 ? '+' : ''}${userPred.toFixed(3)})`,
+      hoverinfo: 'skip',
+    });
+  }
+
+  const layout = {
+    paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+    font: { family: 'Inter, sans-serif', color: '#FAFAF8', size: 11 },
+    xaxis: { title: 'PaxDb / Abele z-score (truth)', gridcolor: 'rgba(201, 169, 97, 0.08)', zerolinecolor: 'rgba(201, 169, 97, 0.28)', range: [-4, 4], zeroline: true },
+    yaxis: { title: 'Aiki-XP Tier D (held-out CV prediction)',   gridcolor: 'rgba(201, 169, 97, 0.08)', zerolinecolor: 'rgba(201, 169, 97, 0.28)', range: [-4, 4], zeroline: true, scaleanchor: 'x', scaleratio: 1 },
+    margin: { l: 70, r: 18, t: 18, b: 55 },
+    legend: { bgcolor: 'rgba(26,26,26,0.7)', bordercolor: 'rgba(201, 169, 97, 0.2)', x: 0.02, y: 0.98 },
+    height: 420,
+  };
+  Plotly.newPlot('host-scatter', traces, layout, { displayModeBar: false, responsive: true });
+}
+
+/* =========================== TIER-AWARE FIELD VISIBILITY =========================== */
+function updateTierVisibility() {
+  const tier = document.querySelector('input[name="tier"]:checked')?.value || 'D';
+  const meta = TIER_META[tier];
+  if (!meta) return;
+  document.getElementById('tier-requirements').textContent = meta.desc;
+  const cdsField = document.getElementById('cds').closest('.form-field');
+  const hostField = document.getElementById('host-input').closest('.form-field');
+  const modeRadios = document.querySelectorAll('input[name="mode"]');
+  const modeField = modeRadios[0]?.closest('.form-field');
+  const showCDS = meta.needs.includes('cds');
+  const showHost = meta.needs.includes('host');
+  cdsField.style.display = showCDS ? '' : 'none';
+  document.getElementById('cds').required = showCDS;
+  hostField.style.display = showHost ? '' : 'none';
+  if (modeField) modeField.style.display = showHost ? '' : 'none';
+  // Scatter panel is only meaningful when predicting in a host context
+  const scatter = document.getElementById('host-scatter-panel');
+  if (!showHost) {
+    scatter.style.display = 'none';
+  } else if (currentScatterData) {
+    scatter.style.display = 'block';
+  }
+}
+document.querySelectorAll('input[name="tier"]').forEach(r => r.addEventListener('change', updateTierVisibility));
+
+/* =========================== AUTO-FILL CDS FROM PROTEIN + HOST =========================== */
+const autofillBtn = document.getElementById('autofill-cds-btn');
+const cdsStatus = document.getElementById('cds-status');
+autofillBtn.addEventListener('click', async () => {
+  const protein = document.getElementById('protein').value.trim().replace(/\s/g, '');
+  if (!protein.match(/^[ACDEFGHIKLMNPQRSTVWY]+$/i)) {
+    cdsStatus.textContent = 'Paste a protein sequence first.';
+    cdsStatus.style.color = '#EF4444';
+    return;
+  }
+  if (!selectedHost?.acc) {
+    cdsStatus.textContent = 'Pick a host organism first.';
+    cdsStatus.style.color = '#EF4444';
+    return;
+  }
+  // Strong loading state so rapid clicks don't look ignored. The button
+  // itself turns into a spinner + disables; the status line below gets
+  // a ticking elapsed counter so users SEE the request is in flight.
+  autofillBtn.disabled = true;
+  const autofillLabel = document.getElementById('autofill-cds-label');
+  const origLabel = autofillLabel ? autofillLabel.textContent : 'Auto-fill CDS from protein + host';
+  if (autofillLabel) {
+    autofillLabel.innerHTML = '<span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid rgba(10,10,10,0.25);border-top-color:rgba(10,10,10,0.7);border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:6px;"></span>Looking up CDS…';
+  }
+  cdsStatus.style.color = 'var(--champagne)';
+  const autofillT0 = Date.now();
+  let tickInt;
+  const tick = () => {
+    const s = Math.floor((Date.now() - autofillT0) / 1000);
+    cdsStatus.textContent = `Looking up CDS for this protein in ${selectedHost.name}… (${s}s elapsed — cold-start can take up to 30 s)`;
+  };
+  tick();
+  tickInt = setInterval(tick, 1000);
+  try {
+    const resp = await fetch(CDS_FOR_PROTEIN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ protein, host: selectedHost.acc }),
+      redirect: 'follow',
+    });
+    const data = await resp.json();
+    clearInterval(tickInt);
+    if (data.error) {
+      cdsStatus.style.color = '#EF4444';
+      cdsStatus.textContent = data.error;
+      return;
+    }
+    document.getElementById('cds').value = data.cds;
+    if (data.source === 'native') {
+      cdsStatus.style.color = '#22C55E';
+      cdsStatus.textContent = `Native match in ${selectedHost.name}: ${data.matched_gene || 'found in genome'}. Using the gene's real CDS.`;
+    } else {
+      cdsStatus.style.color = 'var(--champagne)';
+      cdsStatus.textContent = `No native match — back-translated using ${selectedHost.name}'s codon usage (heterologous).`;
+    }
+  } catch (err) {
+    clearInterval(tickInt);
+    cdsStatus.style.color = '#EF4444';
+    cdsStatus.textContent = `Request failed: ${err.message}. Retry in 30-60s if this was a cold start.`;
+  } finally {
+    clearInterval(tickInt);
+    if (autofillLabel) autofillLabel.textContent = origLabel;
+    autofillBtn.disabled = false;
+  }
+});
+
+/* =========================== INFO TOOLTIP CLICK-TOGGLE (mobile) =========================== */
+document.querySelectorAll('.info').forEach(el => {
+  el.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.querySelectorAll('.info.active').forEach(o => { if (o !== el) o.classList.remove('active'); });
+    el.classList.toggle('active');
+  });
+});
+document.addEventListener('click', () => {
+  document.querySelectorAll('.info.active').forEach(o => o.classList.remove('active'));
+});
+
+/* =========================== GLOSSARY TOGGLE =========================== */
+const glToggle = document.getElementById('glossary-toggle');
+const gl = document.getElementById('glossary');
+glToggle.addEventListener('click', () => {
+  gl.classList.toggle('visible');
+  glToggle.classList.toggle('open');
+});
+
+/* =========================== SUBMIT HANDLER =========================== */
+const form = document.getElementById('predict-form');
+const submitBtn = document.getElementById('submit-btn');
+const errorBox = document.getElementById('error-box');
+const results = document.getElementById('results');
+
+function showError(msg) { errorBox.textContent = msg; errorBox.classList.add('visible'); }
+function hideError() { errorBox.classList.remove('visible'); }
+
+function erf(x) {
+  const a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741;
+  const a4 = -1.453152027, a5 = 1.061405429, p = 0.3275911;
+  const sign = x >= 0 ? 1 : -1; x = Math.abs(x);
+  const t = 1 / (1 + p * x);
+  const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+  return sign * y;
+}
+function zToPercentile(z) { return Math.round(50 * (1 + erf(z / Math.sqrt(2))) * 10) / 10; }
+function interpretPercentile(p) {
+  if (p >= 90) return 'Top 10% of host proteome';
+  if (p >= 75) return 'High expresser';
+  if (p >= 50) return 'Above median';
+  if (p >= 25) return 'Below median';
+  if (p >= 10) return 'Low expresser';
+  return 'Bottom 10% of host proteome';
+}
+function scoreClass(z) { if (z >= 0.5) return 'score-high'; if (z <= -0.5) return 'score-low'; return 'score-mid'; }
+
+function drawHistogram(predictions) {
+  const xs = [];
+  for (let x = -4; x <= 4; x += 0.1) xs.push(x);
+  const pdf = xs.map(x => Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI));
+  const traces = [
+    {
+      x: xs, y: pdf, mode: 'lines', fill: 'tozeroy',
+      line: { color: '#C9A961', width: 2 },
+      fillcolor: 'rgba(201, 169, 97, 0.18)',
+      name: `Host proteome`,
+      hovertemplate: 'z=%{x:.2f}<extra></extra>',
+    },
+  ];
+  predictions.forEach((p, i) => {
+    traces.push({
+      x: [p.predicted_expression, p.predicted_expression],
+      y: [0, 0.48],
+      mode: 'lines+markers',
+      line: { color: '#FAFAF8', width: 2 },
+      marker: { color: '#C9A961', size: 12, symbol: 'triangle-down' },
+      name: `Your gene ${predictions.length > 1 ? (i + 1) : ''}`.trim(),
+      hovertemplate: `Your gene<br>z=%{x:.3f}<extra></extra>`,
+    });
+  });
+  Plotly.newPlot('histogram', traces, {
+    paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+    font: { family: 'Inter, sans-serif', color: '#FAFAF8', size: 12 },
+    xaxis: { title: 'Predicted per-species z-score (←low · high→)', gridcolor: 'rgba(201, 169, 97, 0.08)', zerolinecolor: 'rgba(201, 169, 97, 0.2)', range: [-4, 4] },
+    yaxis: { title: 'Density', gridcolor: 'rgba(201, 169, 97, 0.08)', zerolinecolor: 'rgba(201, 169, 97, 0.2)' },
+    margin: { l: 60, r: 20, t: 10, b: 55 },
+    legend: { bgcolor: 'rgba(26,26,26,0.6)', bordercolor: 'rgba(201, 169, 97, 0.2)' },
+    height: 340,
+  }, { displayModeBar: false, responsive: true });
+}
+
+/* ================ FIND CLOSEST HOST ================
+ * Given the user's protein (no host needed), use the embed+neighbors
+ * chain to suggest the most likely native organism. Auto-selects the
+ * matched host if we have a genome for it; otherwise shows the species
+ * and offers a manual search fallback.
+ */
+const findHostBtn = document.getElementById('find-host-btn');
+const findHostStatus = document.getElementById('find-host-status');
+const findHostLabel = document.getElementById('find-host-label');
+if (findHostBtn) {
+  findHostBtn.addEventListener('click', async () => {
+    const protein = document.getElementById('protein').value.trim().replace(/\s/g, '');
+    if (!protein.match(/^[ACDEFGHIKLMNPQRSTVWY]+$/i)) {
+      findHostStatus.textContent = 'Paste a protein sequence first.';
+      findHostStatus.style.color = '#EF4444';
+      return;
+    }
+    if (protein.length < 30) {
+      findHostStatus.textContent = 'Sequence too short (< 30 aa) to identify a host reliably.';
+      findHostStatus.style.color = '#EF4444';
+      return;
+    }
+    findHostBtn.disabled = true;
+    findHostStatus.style.color = 'var(--champagne)';
+    const t0 = Date.now();
+    let tickInt;
+    const tick = () => {
+      const s = Math.floor((Date.now() - t0) / 1000);
+      findHostStatus.textContent = `Embedding your protein with ESM-C… (${s}s, up to ~60 s on a cold container)`;
+    };
+    tick();
+    tickInt = setInterval(tick, 1000);
+    const origLabel = findHostLabel.textContent;
+    findHostLabel.innerHTML = '<span class="spinner" style="display:inline-block;width:11px;height:11px;border:2px solid rgba(10,10,10,0.25);border-top-color:rgba(10,10,10,0.7);border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:5px;"></span>finding host…';
+    try {
+      const embedResp = await fetch(EMBED_PROTEIN_URL, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ protein }),
+      });
+      const embedData = await embedResp.json();
+      if (embedData.error) throw new Error(embedData.error);
+
+      const nbResp = await fetch(FIND_NEIGHBORS_URL, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ embedding: embedData.esmc_pca128, k: 5 }),
+      });
+      const nbData = await nbResp.json();
+      if (nbData.error || !Array.isArray(nbData.hits) || nbData.hits.length === 0) {
+        findHostStatus.textContent = 'No close matches in the 492K corpus — pick a host manually.';
+        findHostStatus.style.color = '#E8C14D';
+        return;
+      }
+      clearInterval(tickInt);
+      const top = nbData.hits[0];
+      const topSpecies = top.species;
+      // Try 3 match strategies:
+      //   a) Exact species-key include  ("Escherichia_coli_K12" in species_keys)
+      //   b) Underscored species string matches first token of host.name
+      //   c) Host name contains the de-underscored species string
+      // The user reported a case where (a) silently failed even though
+      // species_keys DID contain the target; adding (b) and (c) makes the
+      // match robust to future data drift (e.g. missing species_keys on
+      // bulk-added entries).
+      let host = null;
+      let matchedVia = null;
+      if (topSpecies && HOSTS && HOSTS.length) {
+        host = HOSTS.find(h => (h.species_keys || []).includes(topSpecies));
+        if (host) matchedVia = 'species_keys';
+        if (!host) {
+          const humanReadable = topSpecies.replace(/_/g, ' ').toLowerCase();
+          host = HOSTS.find(h => (h.name || '').toLowerCase().includes(humanReadable));
+          if (host) matchedVia = 'name_substring';
+        }
+        if (!host) {
+          // Genus-only fallback: first word of species_keys entry
+          const genus = topSpecies.split('_')[0].toLowerCase();
+          if (genus.length >= 4) {
+            host = HOSTS.find(h => (h.name || '').toLowerCase().startsWith(genus));
+            if (host) matchedVia = `genus=${genus}`;
+          }
+        }
+      }
+      if (host) {
+        selectedHost = { acc: host.acc, name: host.name,
+                         species_keys: host.species_keys || [], n_test: host.n_test || 0 };
+        hostInput.value = host.name;
+        document.getElementById('host-current').innerHTML =
+          `Currently: <strong>${host.name}</strong> (${host.acc})`;
+        findHostStatus.innerHTML = `→ matched <strong>${top.gene_id.split('|').pop()}</strong> in ${host.name} (cosine ${top.similarity.toFixed(3)}, via ${matchedVia}). Host auto-set.`;
+        findHostStatus.style.color = '#7FC99B';
+        if (typeof detectStale === 'function') detectStale();
+        if (typeof loadHostScatter === 'function') loadHostScatter();
+      } else {
+        // No cached genome matches the top-species directly. Help the user
+        // by pre-populating the host input with the species string so the
+        // existing typeahead + genus fallback does the rest — but do NOT
+        // open the Request-Genome panel (that asks for NCBI chromosome
+        // accessions, not the protein accession we showed as evidence).
+        const humanReadable = topSpecies ? topSpecies.replace(/_/g, ' ') : '';
+        if (humanReadable) {
+          hostInput.value = humanReadable;
+          hostInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        findHostStatus.innerHTML =
+          `Closest-by-ESM-C match is <strong>${top.gene_id.split('|').pop()}</strong> ` +
+          `in species <code>${topSpecies || '?'}</code> (cosine ${top.similarity.toFixed(3)}). ` +
+          `We didn't auto-select a cached genome for that species — check the dropdown above ` +
+          `(already pre-filled with "${humanReadable}") to pick a near relative, or leave the ` +
+          `current host as-is.`;
+        findHostStatus.style.color = 'var(--champagne)';
+      }
+    } catch (err) {
+      clearInterval(tickInt);
+      findHostStatus.textContent = 'Error: ' + err.message;
+      findHostStatus.style.color = '#EF4444';
+    } finally {
+      clearInterval(tickInt);
+      findHostLabel.textContent = origLabel;
+      findHostBtn.disabled = false;
+    }
+  });
+}
+
+/* ================ STALE-RESULTS TRACKING ================
+ * When the user edits protein / CDS / host after a prediction has been
+ * shown, the displayed results are for the PREVIOUS submission. Mark the
+ * results panel visibly stale so it's obvious a re-run is needed.
+ * markFresh() is called at the start of each Run/Compare; detectStale()
+ * runs on every form input change.
+ */
+let _lastSubmitted = { protein: '', cds: '', host: null, tier: null };
+const staleBanner = document.getElementById('stale-results-warn');
+function markFresh(protein, cds, host, tier) {
+  _lastSubmitted = { protein, cds, host, tier };
+  if (staleBanner) staleBanner.style.display = 'none';
+  document.body.classList.remove('results-stale');
+}
+function detectStale() {
+  if (!results.classList.contains('visible')) return;   // no live results
+  if (_lastSubmitted.protein === '') return;
+  const p = document.getElementById('protein').value.trim().replace(/\s/g, '');
+  const c = document.getElementById('cds').value.trim().replace(/\s/g, '');
+  const h = selectedHost?.acc || null;
+  const isStale = (p !== _lastSubmitted.protein
+                || c !== _lastSubmitted.cds
+                || h !== _lastSubmitted.host);
+  if (isStale) {
+    if (staleBanner) staleBanner.style.display = 'block';
+    document.body.classList.add('results-stale');
+  } else {
+    if (staleBanner) staleBanner.style.display = 'none';
+    document.body.classList.remove('results-stale');
+  }
+}
+['protein','cds'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', detectStale);
+});
+// host is set via the typeahead click handler; we'll also patch detectStale
+// into the host-changed moment below.
+
+/* ================ PRE-WARM BUTTON ================
+ * Fires a lightweight request to each GPU tier in parallel to bring the
+ * containers up while the user finishes editing. Returns quickly either
+ * way (errors are surfaced in the status line, never thrown).
+ */
+const prewarmBtn = document.getElementById('prewarm-btn');
+if (prewarmBtn) {
+  prewarmBtn.addEventListener('click', async () => {
+    prewarmBtn.disabled = true;
+    prewarmBtn.textContent = '🔥 warming…';
+    const targets = [
+      ['Tier A', TIER_A_URL, { fasta: '>probe\nMKT\n' }],
+      ['Tier B', TIER_B_URL, { proteins:['MKT'], cds:['ATGAAATAA'], host:'NC_000913.3', mode:'heterologous', anchor:'lacZ' }],
+      ['Tier C', TIER_C_URL, { proteins:['MKT'], cds:['ATGAAATAA'], host:'NC_000913.3', mode:'heterologous', anchor:'lacZ' }],
+      ['Tier D', TIER_D_URL, { proteins:['MKT'], cds:['ATGAAATAA'], host:'NC_000913.3', mode:'heterologous', anchor:'lacZ' }],
+    ];
+    const t0 = performance.now();
+    const report = document.createElement('div');
+    report.style.cssText = 'grid-column:1/-1;margin-top:6px;font-size:0.82rem;color:var(--champagne);opacity:0.85;';
+    report.textContent = 'Pre-warming: fired probes at Tier A/B/C/D… they\'ll stay warm ~5 min after last request.';
+    prewarmBtn.parentElement.parentElement.insertBefore(report, prewarmBtn.parentElement.nextSibling);
+    await Promise.allSettled(targets.map(([name, url, body]) =>
+      fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                   body: JSON.stringify(body), redirect: 'follow' })
+        .then(r => r.ok ? null : `${name}: HTTP ${r.status}`)
+        .catch(e => `${name}: ${e.message}`)
+    ));
+    const dt = ((performance.now() - t0) / 1000).toFixed(1);
+    report.textContent = `Pre-warm complete (${dt}s). Next Run / Compare should hit warm containers.`;
+    prewarmBtn.textContent = '🔥 Pre-warm';
+    prewarmBtn.disabled = false;
+    setTimeout(() => { if (report.parentElement) report.parentElement.removeChild(report); }, 20000);
+  });
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  hideError();
+  results.classList.remove('visible');
+  // Hide the compare panel so old compare-tiers content doesn't linger
+  // when the user runs a single-tier prediction.
+  const cmpPanel = document.getElementById('tier-compare-panel');
+  if (cmpPanel) cmpPanel.style.display = 'none';
+
+  const tier = document.querySelector('input[name="tier"]:checked').value;
+  const meta = TIER_META[tier];
+  const protein = document.getElementById('protein').value.trim().replace(/\s/g, '');
+  const cds = document.getElementById('cds').value.trim().replace(/\s/g, '');
+  const mode = document.querySelector('input[name="mode"]:checked')?.value || 'heterologous';
+
+  if (!protein.match(/^[ACDEFGHIKLMNPQRSTVWY]+$/i)) { showError('Protein must contain only standard amino-acid letters (ACDEFGHIKLMNPQRSTVWY).'); return; }
+  if (meta.needs.includes('cds')) {
+    if (!cds.match(/^[ACGTUN]+$/i)) { showError('CDS must contain only nucleotide letters (ACGTUN).'); return; }
+  }
+
+  // Stamp the form state so stale-detection can compare against the next edit.
+  markFresh(protein, cds, selectedHost?.acc || null, tier);
+
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = `<span class="spinner"></span>Running Tier ${tier}…`;
+
+  // Always request attribution for Tier D — adds ~5 s warm but is
+  // surfaced automatically in the Dissect panel (user no longer has to
+  // check an opt-in box).
+  const wantAttribution = tier === 'D';
+
+  let payload, url;
+  if (tier === 'A') {
+    url = meta.url;
+    payload = { fasta: `>query\n${protein}\n` };
+  } else {
+    url = meta.url;
+    payload = { proteins: [protein], cds: [cds], host: selectedHost.acc, mode, anchor: 'lacZ' };
+    if (wantAttribution) payload.return_attribution = true;
+  }
+
+  // Launch corpus-match lookup in parallel with the tier prediction (cheap CPU call).
+  // Only makes sense when we have a host (not Tier A).
+  const corpusPromise = (tier !== 'A' && selectedHost?.species_keys?.length)
+    ? fetch(FIND_IN_CORPUS_URL, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ protein, host: selectedHost.acc, species_keys: selectedHost.species_keys }),
+      }).then(r => r.json()).catch(() => null)
+    : Promise.resolve(null);
+
+  try {
+    const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), redirect: 'follow' });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status} ${resp.statusText}`);
+    const data = await resp.json();
+    if (data.error) { showError(data.error); return; }
+
+    const corpusMatch = await corpusPromise;
+    const matched = corpusMatch && corpusMatch.matched;
+
+    document.getElementById('result-tier').textContent = data.tier || tier;
+    document.getElementById('result-host').textContent = (tier === 'A') ? '—' : (selectedHost.name + ' (' + (data.host || selectedHost.acc) + ')');
+    document.getElementById('result-mode').textContent = data.mode || (tier === 'A' ? '—' : mode);
+    document.getElementById('result-operon-source').textContent = data.predictions?.[0]?.operon_source || '—';
+    document.getElementById('result-operon-length').textContent = data.predictions?.[0]?.operon_length_nt || '—';
+
+    // Honest disclosure: if user requested native mode but the CDS wasn't
+    // found exactly in the host genome, the backend silently falls back to
+    // heterologous (lacZ context). Surface this as a visible warning so the
+    // prediction isn't mistaken for a true native-operon estimate.
+    const usedOperon = data.predictions?.[0]?.operon_source;
+    const nativeFallbackWarn = document.getElementById('native-fallback-warn');
+    if (tier !== 'A' && mode === 'native' && usedOperon === 'heterologous') {
+      if (nativeFallbackWarn) {
+        nativeFallbackWarn.style.display = 'block';
+        nativeFallbackWarn.textContent =
+          `⚠ You requested native mode, but your CDS wasn't found in ${selectedHost.name}'s genome. ` +
+          `Aiki-XP fell back to heterologous mode (wrapping your CDS in the host's lacZ context). ` +
+          `Click "Auto-fill CDS" for an exact native match, or interpret this number as a heterologous-expression estimate.`;
+      }
+    } else if (nativeFallbackWarn) {
+      nativeFallbackWarn.style.display = 'none';
+    }
+
+    const tbody = document.getElementById('results-tbody');
+    tbody.innerHTML = '';
+
+    // Prepend a row showing corpus-match ground truth + held-out CV prediction
+    if (matched) {
+      const trRow = document.createElement('tr');
+      trRow.className = 'corpus-row';
+      trRow.innerHTML =
+        `<td>${corpusMatch.gene_id.split('|').pop()} <span class="corpus-badge">PaxDb truth</span></td>
+         <td class="${scoreClass(corpusMatch.truth)}">${corpusMatch.truth >= 0 ? '+' : ''}${corpusMatch.truth.toFixed(3)}</td>
+         <td></td>
+         <td>Measured abundance in the paper's training atlas</td>`;
+      tbody.appendChild(trRow);
+      const cvRow = document.createElement('tr');
+      cvRow.className = 'corpus-row';
+      cvRow.innerHTML =
+        `<td>${corpusMatch.gene_id.split('|').pop()} <span class="corpus-badge">held-out CV</span></td>
+         <td class="${scoreClass(corpusMatch.tier_d_cv)}">${corpusMatch.tier_d_cv >= 0 ? '+' : ''}${corpusMatch.tier_d_cv.toFixed(3)}</td>
+         <td></td>
+         <td>Paper's Tier D prediction (fold ${corpusMatch.cv_fold}, ${corpusMatch.is_mega ? 'mega' : 'non-mega'})</td>`;
+      tbody.appendChild(cvRow);
+    }
+
+    data.predictions.forEach((p, i) => {
+      const z = p.predicted_expression;
+      const pct = zToPercentile(z);
+      const row = document.createElement('tr');
+      const label = (matched && i === 0) ? 'Live Tier ' + (data.tier || tier) : `Gene ${i + 1}`;
+      row.innerHTML =
+        `<td>${label}</td>
+         <td class="${scoreClass(z)}">${z >= 0 ? '+' : ''}${z.toFixed(3)}</td>
+         <td><span class="rank-pill">${pct.toFixed(1)}th</span></td>
+         <td>${interpretPercentile(pct)}</td>`;
+      tbody.appendChild(row);
+    });
+
+    drawHistogram(data.predictions);
+    // Overlay user's Tier D prediction (and corpus match, if any) on the species scatter
+    if (currentScatterData && data.predictions?.[0]?.predicted_expression != null) {
+      renderScatter(data.predictions[0].predicted_expression, matched ? corpusMatch : null);
+    }
+    // Modality attribution: if the server returned per-modality contributions, render.
+    if (Array.isArray(data.attribution) && data.attribution.length > 0) {
+      renderAttribution(data.attribution[0], data.predictions[0].predicted_expression);
+    } else {
+      const attrBlock = document.getElementById('dissect-attribution-block');
+      if (attrBlock) attrBlock.style.display = 'none';
+    }
+    // If the user's gene was found in the 492K corpus, also surface its 5 nearest neighbours.
+    let neighborsForDissect = null;
+    if (matched && corpusMatch.gene_id) {
+      neighborsForDissect = await renderNeighbors(corpusMatch.gene_id);
+    } else {
+      document.getElementById('neighbors-panel').style.display = 'none';
+    }
+
+    // Deep-dive / dissect panel — pure client-side derivations from already-fetched data.
+    const predZ = data.predictions?.[0]?.predicted_expression;
+    renderDissect(tier, predZ, protein, cds, neighborsForDissect, selectedHost?.name);
+    // UMAP landscape: project the user's protein.
+    // Corpus match → use gene_id directly (fastest, exact).
+    // Novel protein → extract ESM-C PCA128 via /embed_protein, then project
+    //                 that 128-d vector via K-NN. ~5-30 s depending on cold state.
+    if (matched && corpusMatch.gene_id) {
+      showUmap({ gene_id: corpusMatch.gene_id });
+    } else if (tier !== 'A') {
+      // We only have an ESM-C embedding pipeline on the Tier A container,
+      // and only when a real protein was submitted (which is true for any
+      // non-A tier by validation). Embed + project.
+      showUmapViaEmbedding(protein);
+    } else {
+      // Tier A submission — no host, skip UMAP to avoid confusion
+      document.getElementById('umap-panel').style.display = 'none';
+    }
+    // Structure panel becomes available (user clicks "Fold this protein" to fire)
+    const strucPanel = document.getElementById('structure-panel');
+    const strucViewer = document.getElementById('structure-viewer');
+    const strucStatus = document.getElementById('structure-status');
+    if (strucPanel) {
+      strucPanel.style.display = 'block';
+      if (strucViewer) strucViewer.style.display = 'none';   // clear old fold
+      if (strucStatus) strucStatus.textContent = 'Click "Fold this protein" to predict the 3D structure via ESMFold Atlas (≤400 aa, usually <1 s warm).';
+    }
+    lastPrediction = { request: payload, tier, response: data, corpusMatch: matched ? corpusMatch : null };
+    results.classList.add('visible');
+    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (err) {
+    showError(`Request failed: ${err.message}. If this was the first request after a period of inactivity, the GPU is cold-starting — please retry in 30-60 seconds.`);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Run prediction';
+  }
+});
+
+/* =========================== COMPARE ALL TIERS =========================== */
+const compareBtn = document.getElementById('compare-btn');
+const tierComparePanel = document.getElementById('tier-compare-panel');
+const tierCompareTbody = document.getElementById('tier-compare-tbody');
+const tierCompareNarrative = document.getElementById('tier-compare-narrative');
+
+// Tier B+ is temporarily disabled while we fix an extractor / checkpoint dim
+// mismatch (deployed was feeding Evo-2 7B features into a 1B-trained adapter,
+// silently truncated by the ensemble). See the landing page's visible
+// banner explaining the correction.
+const TIER_COMPARE_META = {
+  A:      { url: TIER_A_URL,      label: 'Tier A',  mods: 'ESM-C + ProtT5',
+            stages: [
+              { after: 0,  msg: 'encoding ESM-C + ProtT5 (CPU)…' },
+              { after: 8,  msg: 'fusion head — almost there…' },
+            ] },
+  B:      { url: TIER_B_URL,      label: 'Tier B',  mods: '+ HyenaDNA + classical codon/protein/disorder',
+            stages: [
+              { after: 0,  msg: 'container cold-start or warm routing…' },
+              { after: 6,  msg: 'loading HyenaDNA + classical features on GPU…' },
+              { after: 30, msg: 'GPU running — fusion in progress…' },
+            ] },
+  C:      { url: TIER_C_URL,      label: 'Tier C',  mods: '+ Evo-2 7B full operon',
+            stages: [
+              { after: 0,  msg: 'container cold-start or warm routing…' },
+              { after: 8,  msg: 'loading Evo-2 7B (14 GB) into A100 VRAM…' },
+              { after: 45, msg: 'Evo-2 loaded — encoding full-operon window…' },
+              { after: 90, msg: 'still warming — Evo-2 cold-start can take 90-120 s…' },
+            ] },
+  D:      { url: TIER_D_URL,      label: 'Tier D',  mods: '+ Bacformer-large + operon structure (5 modalities — paper champion)',
+            stages: [
+              { after: 0,   msg: 'container cold-start or warm routing…' },
+              { after: 8,   msg: 'loading Evo-2 7B + Bacformer-large on A100…' },
+              { after: 60,  msg: 'models loaded — extracting the 5 modalities…' },
+              { after: 120, msg: 'still warming — first Tier D on a cold host takes 2-3 min…' },
+            ] },
+};
+const TIER_COMPARE_ORDER = ['A', 'B', 'C', 'D'];   // B+ omitted pending correction
+
+function stageMessageFor(tier, elapsedSec) {
+  const stages = TIER_COMPARE_META[tier]?.stages || [];
+  let msg = 'running…';
+  for (const s of stages) { if (elapsedSec >= s.after) msg = s.msg; }
+  return msg;
+}
+
+async function runOneTier(tier, protein, cds, host, mode, attempt = 1) {
+  const meta = TIER_COMPARE_META[tier];
+  const payload = tier === 'A'
+    ? { fasta: `>query\n${protein}\n` }
+    : { proteins: [protein], cds: [cds], host, mode, anchor: 'lacZ' };
+  const t0 = performance.now();
+  try {
+    const resp = await fetch(meta.url, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload), redirect: 'follow',
+    });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error);
+    const z = data.predictions?.[0]?.predicted_expression;
+    if (z == null) throw new Error('no prediction in response');
+    return {
+      tier, z,
+      elapsed: (performance.now() - t0) / 1000,
+      operon_source: data.predictions?.[0]?.operon_source || null,
+      error: null,
+    };
+  } catch (err) {
+    // Cold-start flake: Modal returns 303 while the GPU container is spawning.
+    // If fetch() errored with "Failed to fetch" (TypeError) OR we got an HTTP
+    // 5xx, retry once after 3 s — by then the container is usually warm.
+    const msg = err.message || String(err);
+    const isTransient = msg.includes('Failed to fetch') ||
+                        msg.includes('NetworkError') ||
+                        /^HTTP 5\d\d/.test(msg);
+    if (isTransient && attempt < 2) {
+      await new Promise(r => setTimeout(r, 3000));
+      return runOneTier(tier, protein, cds, host, mode, attempt + 1);
+    }
+    return { tier, z: null, elapsed: (performance.now() - t0) / 1000, operon_source: null, error: msg };
+  }
+}
+
+compareBtn.addEventListener('click', async () => {
+  hideError();
+  const protein = document.getElementById('protein').value.trim().replace(/\s/g, '');
+  const cds = document.getElementById('cds').value.trim().replace(/\s/g, '');
+  const mode = document.querySelector('input[name="mode"]:checked')?.value || 'heterologous';
+
+  if (!protein.match(/^[ACDEFGHIKLMNPQRSTVWY]+$/i)) {
+    showError('Protein must contain only standard amino-acid letters.');
+    return;
+  }
+  if (!cds.match(/^[ACGTUN]+$/i)) {
+    showError('CDS is required for tiers B/B+/C/D (provide a coding sequence).');
+    return;
+  }
+  if (!selectedHost?.acc) {
+    showError('Select a host organism — all tiers except A need a host for operon context.');
+    return;
+  }
+
+  markFresh(protein, cds, selectedHost.acc, 'compare');
+
+  compareBtn.disabled = true;
+  submitBtn.disabled = true;
+  compareBtn.innerHTML = '<span class="spinner"></span>Running tiers A, B, C, D in parallel…';
+
+  // The compare panel lives INSIDE #results. If the user clicks Compare before
+  // ever running a single-tier prediction, #results is display:none and this
+  // panel stays invisible — user sees nothing. Make the container visible.
+  results.classList.add('visible');
+
+  // Hide single-tier-specific panels so stale content from a previous Run
+  // doesn't mix with fresh compare-tiers output.
+  const neighPanel = document.getElementById('neighbors-panel');
+  const nativeWarn = document.getElementById('native-fallback-warn');
+  const umapPanel = document.getElementById('umap-panel');
+  const strucPanel = document.getElementById('structure-panel');
+  const dissectPanel = document.getElementById('dissect-panel');
+  if (neighPanel) neighPanel.style.display = 'none';
+  if (nativeWarn) nativeWarn.style.display = 'none';
+  if (umapPanel) umapPanel.style.display = 'none';
+  if (strucPanel) strucPanel.style.display = 'none';
+  if (dissectPanel) dissectPanel.style.display = 'none';
+
+  // Render skeleton rows immediately so user sees progress.
+  // Each skeleton has an inline "running… Xs" counter that ticks every second
+  // (cold Tier B+ can legitimately take 100 s; without a ticker it looks hung).
+  tierComparePanel.style.display = 'block';
+  tierCompareTbody.innerHTML = '';
+  const tiers = TIER_COMPARE_ORDER;   // Tier B+ skipped while correction is in flight
+  const tierStartedAt = {};
+  const tierDone = {};
+  const rowId = t => `tc-row-${t.replace('+', 'p')}`;
+  const elapsedSpanId = t => `tc-elapsed-${t.replace('+', 'p')}`;
+  const stageSpanId = t => `tc-stage-${t.replace('+', 'p')}`;
+  for (const t of tiers) {
+    tierStartedAt[t] = Date.now();
+    tierDone[t] = false;
+    const row = document.createElement('tr');
+    row.id = rowId(t);
+    row.innerHTML = `<td><strong>${TIER_COMPARE_META[t].label}</strong></td>
+                     <td style="opacity:0.75">${TIER_COMPARE_META[t].mods}</td>
+                     <td colspan="3" style="opacity:0.75">
+                       <span class="spinner" style="display:inline-block;width:10px;height:10px;border:2px solid rgba(201,169,97,0.3);border-top-color:var(--primary-gold);border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;"></span>
+                       <span id="${stageSpanId(t)}" style="font-style:italic;">${stageMessageFor(t, 0)}</span>
+                       &nbsp;·&nbsp;<span id="${elapsedSpanId(t)}">0s</span>
+                     </td>`;
+    tierCompareTbody.appendChild(row);
+  }
+  tierComparePanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // Reassurance banner slot ABOVE the table — surfaces cold-start messaging
+  // and running progress summary at a glance. Created inside the panel so it
+  // vanishes when the panel is re-hidden.
+  let progressBanner = document.getElementById('tc-progress-banner');
+  if (!progressBanner) {
+    progressBanner = document.createElement('div');
+    progressBanner.id = 'tc-progress-banner';
+    progressBanner.style.cssText = 'margin:8px 0 14px 0;padding:10px 14px;border-radius:8px;background:rgba(201,169,97,0.06);border-left:3px solid var(--primary-gold);font-size:0.88rem;color:var(--pearl);';
+    tierComparePanel.insertBefore(progressBanner, tierCompareTbody.closest('table'));
+  }
+  progressBanner.style.display = 'block';
+  const nTiers = tiers.length;
+  progressBanner.innerHTML =
+    `<strong>0/${nTiers}</strong> tiers returned · 0s elapsed &nbsp;·&nbsp; ` +
+    `<span style="opacity:0.85;">warm target: ~10-15 s total; cold target: ~60-120 s (Evo-2 7B loads)</span> &nbsp;·&nbsp; ` +
+    `<span style="opacity:0.75;">Tier B+ skipped — under correction</span>`;
+
+  // Ticking interval: updates each still-running row's "Xs" counter + the
+  // top banner's aggregate progress + appends a cold-start hint at 90 s.
+  const t0 = Date.now();
+  let coldHintShown = false;
+  const ticker = setInterval(() => {
+    const total = Math.floor((Date.now() - t0) / 1000);
+    let nDone = 0;
+    for (const t of tiers) {
+      if (tierDone[t]) { nDone++; continue; }
+      const dt = Math.floor((Date.now() - tierStartedAt[t]) / 1000);
+      const eSpan = document.getElementById(elapsedSpanId(t));
+      if (eSpan) eSpan.textContent = `${dt}s`;
+      const sSpan = document.getElementById(stageSpanId(t));
+      if (sSpan) sSpan.textContent = stageMessageFor(t, dt);
+    }
+    let msg = `<strong>${nDone}/${nTiers}</strong> tiers returned · ${total}s elapsed`;
+    if (!coldHintShown && total > 90 && nDone < nTiers) {
+      msg += ' — cold-start is ongoing (Tier C/D load Evo-2 7B and Bacformer-large, ~90-120 s on fresh containers). Don\'t refresh; let it finish.';
+      coldHintShown = true;
+    } else if (total > 30 && nDone < nTiers) {
+      msg += ' — GPU containers warming up. Each row updates as its tier returns.';
+    } else if (nDone < nTiers) {
+      msg += ' — rows below update live with each tier\'s current stage.';
+    }
+    progressBanner.innerHTML = msg;
+    compareBtn.innerHTML = `<span class="spinner"></span>Running ${nTiers} tiers in parallel… ${nDone}/${nTiers} · ${total}s`;
+    if (nDone === nTiers) clearInterval(ticker);
+  }, 1000);
+
+  const host = selectedHost.acc;
+  // Fire all 5 in parallel; resolve each to update its row as it returns.
+  // NB: renamed from `results` → `tierResults` to avoid shadowing the outer
+  // #results DOM reference (const TDZ would throw at the earlier
+  // `results.classList.add('visible')` call since the shadow is block-scoped).
+  const tierResults = {};
+
+  await Promise.all(tiers.map(async (t) => {
+    const r = await runOneTier(t, protein, cds, host, mode);
+    tierResults[t] = r;
+    tierDone[t] = true;
+    const row = document.getElementById(rowId(t));
+    if (!row) return;
+    if (r.error) {
+      row.innerHTML = `<td><strong>${TIER_COMPARE_META[t].label}</strong></td>
+                       <td style="opacity:0.75">${TIER_COMPARE_META[t].mods}</td>
+                       <td colspan="3" style="color:#EF4444">× ${r.error}</td>`;
+    } else {
+      const deltaText = t === 'A' ? '—' : (tierResults.A?.z != null ? `${(r.z - tierResults.A.z) >= 0 ? '+' : ''}${(r.z - tierResults.A.z).toFixed(3)}` : '—');
+      row.innerHTML = `<td><strong>${TIER_COMPARE_META[t].label}</strong></td>
+                       <td style="opacity:0.75">${TIER_COMPARE_META[t].mods}</td>
+                       <td class="${scoreClass(r.z)}">${r.z >= 0 ? '+' : ''}${r.z.toFixed(3)}</td>
+                       <td>${deltaText}</td>
+                       <td style="opacity:0.75">${r.elapsed.toFixed(1)}s</td>`;
+    }
+  }));
+
+  clearInterval(ticker);
+  if (progressBanner) {
+    const errs = tiers.filter(t => tierResults[t]?.error);
+    const okCount = tiers.length - errs.length;
+    progressBanner.textContent = `Complete — ${okCount}/${nTiers} tiers succeeded` +
+      (errs.length ? ` · errors: ${errs.join(', ')}` : '') +
+      ` · ${Math.floor((Date.now() - t0) / 1000)}s total` +
+      ` (Tier B+ skipped — under correction)`;
+  }
+
+  // Render bar chart of all 5 predictions
+  const ok = tiers.filter(t => tierResults[t]?.z != null);
+  if (ok.length >= 2) {
+    const trace = {
+      x: ok.map(t => tierResults[t].z),
+      y: ok.map(t => TIER_COMPARE_META[t].label),
+      type: 'bar', orientation: 'h',
+      marker: { color: ok.map(t => tierResults[t].z >= 0 ? '#C9A961' : '#1E4A8A'),
+                line: { color: '#FAFAF8', width: 1 } },
+      text: ok.map(t => (tierResults[t].z >= 0 ? '+' : '') + tierResults[t].z.toFixed(3)),
+      textposition: 'outside', textfont: { color: '#FAFAF8' },
+      hovertemplate: '%{y}: %{x:+.3f}<extra></extra>',
+    };
+    Plotly.newPlot('tier-compare-chart', [trace], {
+      paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+      font: { family: 'Inter, sans-serif', color: '#FAFAF8', size: 12 },
+      xaxis: { title: 'Predicted z-score', gridcolor: 'rgba(201,169,97,0.08)',
+               zerolinecolor: 'rgba(201,169,97,0.3)', range: [-3, 3] },
+      yaxis: { autorange: 'reversed' },
+      margin: { l: 70, r: 40, t: 10, b: 45 },
+      height: 240,
+    }, { displayModeBar: false, responsive: true });
+
+    // Narrative sentence quantifying the tier ladder
+    const zA = tierResults.A?.z, zD = tierResults.D?.z, zB = tierResults.B?.z, zC = tierResults.C?.z;
+    let narrative = 'Each tier adds a modality. ';
+    if (zA != null && zD != null) {
+      const total = zD - zA;
+      narrative += `Tier A (protein only) predicts ${zA >= 0 ? '+' : ''}${zA.toFixed(3)}; Tier D (full 5-modality champion) predicts ${zD >= 0 ? '+' : ''}${zD.toFixed(3)}, a shift of ${total >= 0 ? '+' : ''}${total.toFixed(3)} z from adding DNA, operon, and genome context. `;
+      if (zB != null && zC != null) {
+        const proteinOnly = zB - zA;
+        const operon = zC - zB;
+        const genome = zD - zC;
+        const parts = [];
+        if (Math.abs(proteinOnly) > 0.02) parts.push(`protein+DNA classical (${proteinOnly >= 0 ? '+' : ''}${proteinOnly.toFixed(2)})`);
+        if (Math.abs(operon) > 0.02) parts.push(`operon DNA (${operon >= 0 ? '+' : ''}${operon.toFixed(2)})`);
+        if (Math.abs(genome) > 0.02) parts.push(`Bacformer genome (${genome >= 0 ? '+' : ''}${genome.toFixed(2)})`);
+        if (parts.length) narrative += 'Dominant contributions: ' + parts.join(', ') + '.';
+      }
+    }
+    // Honest disclosure: if user requested native mode but the backend
+    // silently fell back to heterologous (CDS not found exactly in host), say so.
+    const requestedMode = mode;
+    const anyFellBack = ['B','B+','C','D'].some(t => {
+      const r = tierResults[t];
+      return r && !r.error && r.operon_source === 'heterologous' && requestedMode === 'native';
+    });
+    if (anyFellBack) {
+      narrative += ' Note: you selected native mode, but your CDS was not found exactly in ' +
+                   `${selectedHost?.name || 'the host'}'s genome, so tiers B/B+/C/D fell back to ` +
+                   'heterologous (lacZ context). Click "Auto-fill CDS" for an exact native match.';
+    }
+    tierCompareNarrative.textContent = narrative;
+  }
+
+  compareBtn.disabled = false;
+  submitBtn.disabled = false;
+  compareBtn.textContent = 'Compare tiers A, B, C, D';
+});
+
+/* =========================== SHARE-BY-URL =========================== */
+let lastPrediction = null;
+const shareBtn = document.getElementById('share-btn');
+const shareJsonBtn = document.getElementById('share-json-btn');
+const shareToast = document.getElementById('share-toast');
+const MAX_SHARE_SEQ = 8000;  // generous — typical bacterial gene is ~300 AA / ~900 nt
+
+function buildShareURL() {
+  const tier = document.querySelector('input[name="tier"]:checked').value;
+  const protein = document.getElementById('protein').value.trim().replace(/\s/g, '');
+  const cds = document.getElementById('cds').value.trim().replace(/\s/g, '');
+  const mode = document.querySelector('input[name="mode"]:checked')?.value || 'heterologous';
+  const host = selectedHost?.acc || 'NC_000913.3';
+  const params = new URLSearchParams();
+  params.set('tier', tier);
+  params.set('host', host);
+  params.set('mode', mode);
+  params.set('p', protein);
+  if (cds) params.set('c', cds);
+  return window.location.origin + window.location.pathname + '?' + params.toString();
+}
+
+function flashToast(text) {
+  shareToast.textContent = text;
+  shareToast.classList.add('visible');
+  setTimeout(() => shareToast.classList.remove('visible'), 1600);
+}
+
+async function copyToClipboard(text, successMsg) {
+  try {
+    await navigator.clipboard.writeText(text);
+    flashToast(successMsg);
+  } catch {
+    // Fallback for non-secure contexts
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); flashToast(successMsg); }
+    catch { flashToast('Copy failed — select manually'); }
+    document.body.removeChild(ta);
+  }
+}
+
+shareBtn.addEventListener('click', () => {
+  const url = buildShareURL();
+  if (url.length > MAX_SHARE_SEQ + 500) {
+    flashToast('Sequence too long for URL share');
+    return;
+  }
+  copyToClipboard(url, 'Link copied!');
+});
+
+shareJsonBtn.addEventListener('click', () => {
+  if (!lastPrediction) { flashToast('Run a prediction first'); return; }
+  copyToClipboard(JSON.stringify(lastPrediction, null, 2), 'JSON copied!');
+});
+
+function applyShareParams() {
+  const params = new URLSearchParams(window.location.search);
+  const p = params.get('p');
+  const tier = params.get('tier');
+  if (!p || !tier) return false;
+  if (!/^[ACDEFGHIKLMNPQRSTVWY]+$/i.test(p)) return false;
+  if (p.length > MAX_SHARE_SEQ) return false;
+  const c = params.get('c') || '';
+  if (c && !/^[ACGTUN]+$/i.test(c)) return false;
+  if (c.length > MAX_SHARE_SEQ * 3) return false;
+  const host = params.get('host') || 'NC_000913.3';
+  const mode = params.get('mode') || 'heterologous';
+
+  document.getElementById('protein').value = p;
+  if (c) document.getElementById('cds').value = c;
+
+  const tierRadio = document.querySelector(`input[name="tier"][value="${tier}"]`);
+  if (tierRadio) { tierRadio.checked = true; updateTierVisibility(); }
+
+  const modeRadio = document.querySelector(`input[name="mode"][value="${mode}"]`);
+  if (modeRadio) modeRadio.checked = true;
+
+  const hostMatch = HOSTS.find(h => h.acc === host);
+  if (hostMatch) {
+    selectedHost = { acc: hostMatch.acc, name: hostMatch.name,
+                     species_keys: hostMatch.species_keys || [], n_test: hostMatch.n_test || 0 };
+    hostInput.value = hostMatch.name;
+    hostCurrent.innerHTML = `Currently: <strong>${hostMatch.name}</strong> (${hostMatch.acc})`;
+  }
+  return true;
+}
+
+/* =========================== INIT =========================== */
+(async () => {
+  await loadHosts();
+  // Hydrate default selectedHost with species_keys from the manifest so the
+  // initial scatter can load without waiting for a user click.
+  const ecoli = HOSTS.find(h => h.acc === 'NC_000913.3');
+  if (ecoli) {
+    selectedHost = { acc: ecoli.acc, name: ecoli.name,
+                     species_keys: ecoli.species_keys || [], n_test: ecoli.n_test || 0 };
+    loadHostScatter();
+  }
+  // If the URL carries ?p=...&tier=... params, auto-fill form from a shared link.
+  // Deliberately do NOT auto-submit — user still clicks "Run prediction" so the
+  // GPU isn't fired without consent (Tier D cold-start costs ~90 s).
+  if (applyShareParams()) {
+    const banner = document.createElement('div');
+    banner.style.cssText = 'padding:12px 16px;margin:12px 0;background:rgba(201,169,97,0.1);border:1px solid rgba(201,169,97,0.3);border-radius:8px;color:var(--champagne);font-size:0.88rem;';
+    banner.innerHTML = '🔗 Form pre-filled from shared link — click <strong>Run prediction</strong> to reproduce.';
+    form.insertBefore(banner, form.firstChild);
+    if (selectedHost?.species_keys?.length) loadHostScatter();
+  }
+})();
+updateTierVisibility();
+</script>
+</body>
+</html>

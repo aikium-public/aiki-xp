@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "aikixp"
+version = "1.0.0"
+description = "Aiki-XP: leakage-controlled multimodal prediction of protein expression at pan-bacterial scale"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Hudson Tien"},
+    {name = "Radheesh Sharma Meda"},
+    {name = "Shankar Shastry"},
+    {name = "Venkatesh Mysore", email = "venkatesh@aikium.com"},
+]
+keywords = ["protein expression", "multimodal fusion", "foundation models", "bacterial genomics"]
+
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "scipy>=1.11",
+    "torch>=2.0",
+    "scikit-learn>=1.3",
+    "tqdm",
+    "pyyaml",
+    "joblib",
+]
+
+[project.optional-dependencies]
+figures = [
+    "matplotlib>=3.7",
+    "seaborn>=0.12",
+]
+extraction = [
+    "transformers>=4.36",
+    "biopython>=1.83",
+]
+
+[project.urls]
+Paper = "https://doi.org/XXXXXXX"
+Repository = "https://github.com/aikium-public/aiki-xp"
+Data = "https://doi.org/10.5281/zenodo.XXXXXXX"
+
+[tool.setuptools.packages.find]
+include = ["aikixp*"]

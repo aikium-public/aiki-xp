@@ -1,0 +1,334 @@
+# =============================================================================
+# XP5 Deployment Tiers — SINGLE SOURCE OF TRUTH for model selection
+# =============================================================================
+#
+# Every external evaluation MUST use the recipe specified here for its
+# information tier. No ad-hoc model selection. See inference.py for the canonical inference path.
+#
+# Tier assignment is based on what information the USER can provide,
+# NOT on what works best for a particular dataset.
+#
+# Recipe selection is based on 492K 5-fold CV ρ_nm, using the rule:
+#   "Simplest model that is not statistically worse than the best
+#    at each tier (paired t-test, p<0.05 across 5 folds)."
+#
+# Biophysical features are included ONLY where they significantly
+# improve over PLM-only (p=0.031 at Tier B, p=0.030 at Tier D).
+# At Tiers A and C, biophysical features do not survive the test
+# (p=0.616, p=0.149) and are excluded.
+#
+# 2026-04-09 update: ProtT5-XL added at every tier. Tier A upgraded
+# (ESM-C solo → ESM-C+ProtT5, p=0.005). Tier C simplified (hardhybrid
+# 4-mod → Evo-2+ProtT5 2-mod, p=0.124 ns → simpler wins). Tier D
+# unchanged (ProtT5 addition ns: p=0.404).
+#
+# 2026-04-10 update: init60 × ProtT5 cross-augmentation (10 recipes).
+# R2 (ProtT5+init_70nt at "Tier B") gave Δ=+0.024, p=0.001 — but
+# evo2_7b_init_70nt_pca4096 requires 35 nt upstream of ATG (the UTR
+# junction), which Tier B's "CDS only" input contract does not provide.
+# R2 is RECLASSIFIED as a Tier C variant (ρ=0.555, below Tier C lock
+# 0.575). Tier B REVERTED to deploy_protein_cds_features_6mod (0.531).
+# Tier C window-swap recipes (R5 init_70nt, R6 CDS) were significantly
+# WORSE than full_operon (p<0.003), confirming full_operon is the right
+# Evo-2 7B window for general cross-gene prediction.
+#
+# Training-set flanking context audit (2026-04-10): 95.3% of singleton
+# operons (78.6% of 492K) have exactly 100+50 nt fixed padding around
+# CDS. 99.6% of all genes have ≥100+50 nt. Tier C context requirement
+# updated to "≥100 nt upstream + ≥50 nt downstream" to match training.
+# =============================================================================
+
+tiers:
+  # =============================================================================
+  # DISPLAY vs INTERNAL NAMING (2026-04-13, §A.TIER_B_PLUS_DISPLAY_RENAME)
+  # =============================================================================
+  # The key `A_plus_protein_init_window` is the INTERNAL identifier used
+  # throughout the codebase (inference scripts, result filenames, audit
+  # sections). The EXTERNAL display label in the manuscript, figures,
+  # and user-facing docs is "Tier B+" — because the tier's recipe sits
+  # strictly above Tier B in the monotone ladder (Tier B body + 2
+  # additional modalities), not above Tier A.
+  #
+  # DO NOT RENAME the key here. Renaming would break:
+  #   - scripts/protex/xp5_inference.py (tier selection)
+  #   - results/recipe_5fold_cv/tier_a_init60_* filenames
+  #   - results/comprehensive_external_eval/tier_a_canonical/
+  #   - AUDIT §A.TIER_A_PLUS* section names
+  #   - historical result entries
+  #   - Every script referencing the config key
+  #
+  # To refer to this tier in user-facing text, use "Tier B+" (display).
+  # To reference it in code, use `A_plus_protein_init_window` (internal).
+  # =============================================================================
+  #
+  # MONOTONE LADDER (the paper's central framing, as of 2026-04-13):
+  #
+  #     A  → B  → B+ → C  → D
+  #   protein → +CDS → +5′UTR → +full operon → +host genome
+  #    0.518   0.530   0.555    0.576         0.592
+  #
+  # Each tier is a strict superset of the previous tier in both input
+  # data and ρ_nc. This ladder IS the central result of the paper:
+  # "more biological context → better expression prediction" — a cleaner
+  # version of the signal we originally chased with Evo-2 7B alone.
+  # =============================================================================
+  #
+  # NOTE (2026-04-10/11): init60 hygiene and init60 × ProtT5 cross-augmentation
+  # found that evo2_7b_init_70nt_pca4096 produces significant improvements
+  # when added at the "Tier A" level (+0.020, p=0.0006) and on top of the
+  # Tier B body (R2: +0.024, p=0.0009, 5/5 folds).
+  #
+  # 2026-04-13 CORRECTION (§A.TIER_A_PLUS_MISALIGNMENT): the original
+  # Tier A+ entry reported the 3-mod init-window-only ablation (0.538) as
+  # a deployment recipe. This was biologically misleading — no real user
+  # has "upstream DNA without the CDS that follows the ATG." The R2 8-mod
+  # recipe (Tier B body + ProtT5 + init_70nt, 0.555) is the correct
+  # Tier B+ deployment lock. The old 0.538 ablation is moved to a
+  # scientific-ablation note below (_historical_ fields) for provenance.
+  #
+  # Training-set flanking context (computed 2026-04-10):
+  #   Singletons (78.6% of 492K): EXACTLY 100 nt upstream + 50 nt downstream
+  #     of CDS in 95.3% of cases (fixed padding from the operon extraction
+  #     pipeline). 99.6% of ALL 492K genes have ≥100 nt up + ≥50 nt down.
+  #   Deployment implication: Tier C users should provide ≥100 nt upstream
+  #     + ≥50 nt downstream of CDS to be in-distribution for full_operon.
+  #     Providing less (e.g., Cambray's 89 nt up + 0 nt down) is a mild
+  #     distribution shift for the full_operon mean-pool.
+
+  A_protein_only:
+    description: "User provides protein sequence only (FASTA)"
+    recipe: "esmc_prott5_seed42"
+    n_folds: 5
+    rho_nm: 0.5182
+    rho_nm_std: 0.0111
+    modalities: ["esmc_protein", "prot_t5_xl_protein"]
+    classical_features: false
+    statistical_justification: >
+      ESM-C+ProtT5-XL beats ESM-C solo by Δ=+0.009 (p=0.005, 5/5 wins).
+      The only protein-only fusion that is statistically significantly
+      better than ESM-C solo. Adding biophys (Δ=-0.001, p=0.616) or
+      ESM-2 (Δ=+0.001, p=0.687) gives nothing further. ProtT5 solo
+      (0.511) is tied with ESM-C solo (0.509); the gain comes from FUSION.
+    use_for:
+      - "Solubility cross-evaluation (protein only, no DNA)"
+      - "Boel 2016, Price/NESG 2011, SSGCID (heterologous, no native context)"
+      - "Any FASTA-only input"
+
+  A_plus_protein_init_window:
+    # INTERNAL KEY: A_plus_protein_init_window (kept for pipeline stability)
+    # DISPLAY LABEL: "Tier B+" (used in manuscript, figures, user-facing docs)
+    # See §A.TIER_B_PLUS_DISPLAY_RENAME for the naming-convention rationale.
+    # Updated 2026-04-15 — replaces the contaminated R2 recipe (see
+    # §A.TIER_B_PLUS_CONTAMINATION_2026-04-15). The previous lock used
+    # `evo2_7b_init_70nt_pca4096`, which was extracted from the FULL operon
+    # via positional slicing (`evo2_7b_multiwindow_extract.py:203`). Solo
+    # ρ_nc gap = 0.354 (sliced) − 0.211 (1B standalone) = 0.143, 6× the
+    # +0.024 R2 gain over Tier B — meaning most or all of R2's gain was
+    # operon-context contamination. The replacement uses both the 16-d
+    # ViennaRNA biophysical block and the Evo-2 1B 60-nt init-window
+    # embedding, both of which are extractable from a true 70-nt standalone
+    # window with no upstream operon dependency.
+    display_label: "Tier B+"
+    description: "User provides protein sequence + full CDS + ≥35 nt 5′ UTR (UTR-CDS junction). Monotone step above Tier B in the deployment ladder: every Tier B user who also has the upstream DNA context should use this recipe."
+    recipe: "tier_b_evo2_init_window_classical_rna_init_prott5_seed42"
+    n_folds: 5
+    rho_nm: 0.5428
+    rho_nm_std: 0.0143
+    modalities: ["esmc_protein", "hyenadna_dna_cds", "codonfm_cds",
+                 "classical_codon", "classical_protein", "classical_disorder",
+                 "evo2_init_window", "classical_rna_init", "prot_t5_xl_protein"]
+    classical_features: true
+    statistical_justification: >
+      Stacking ProtT5-XL, the Evo-2 1B 60-nt standalone init-window
+      embedding, and the 16-d ViennaRNA 5′ UTR biophysical block on top
+      of the Tier B 6-modality body gives ρ_nc = 0.5428 ± 0.0143, a
+      Δ = +0.0116 improvement over Tier B alone (paired t-test
+      p = 0.007239, 5/5 fold wins). The three additions are synergistic —
+      none contributes significantly alone on top of Tier B. All features
+      are extractable from a standalone 70-nt window with no upstream
+      operon dependency, unlike the previous contaminated Evo-2 7B
+      init_70nt recipe which was extracted via positional slicing from
+      a full-operon forward pass.
+      Per-fold ρ_nm: 0.5434, 0.5448, 0.5566, 0.5190, 0.5502.
+      Canonical source: results/recipe_5fold_cv/tier_b_evo2_init_window_classical_rna_init_prott5_seed42_fold{0..4}.json.
+      Audit: §A.TIER_B_PLUS_CONTAMINATION_2026-04-15 (the 2026-04-15 cleanup
+      that replaced the contaminated R2 recipe with this clean candidate).
+    use_for:
+      - "Native expression prediction when genome annotation is not available but a gene with its upstream UTR is"
+      - "Engineered expression constructs where the user specifies both the RBS/UTR and the full downstream CDS"
+      - "Any task where the user provides protein + full CDS + ≥35 nt 5′ UTR"
+    note: >
+      This is the next strict monotone step above Tier B. Tier B (0.530)
+      uses protein + CDS alone; Tier B+ (0.543) adds both the 16-d
+      ViennaRNA biophysical block and the Evo-2 1B 60-nt init-window
+      embedding (plus ProtT5-XL) on top. Tier C (0.576) replaces the CDS
+      body with full-operon context and requires ≥100 nt upstream + ≥50 nt
+      downstream.
+
+  # =============================================================================
+  # HISTORICAL / REJECTED ENTRY (2026-04-15)
+  # =============================================================================
+  #
+  # The R2 8-modality recipe `tier_b_init60_evo2_7b_init_70nt_pca4096_prott5_seed42`
+  # at ρ_nc = 0.555 was the Tier B+ deployment lock from 2026-04-13 to
+  # 2026-04-15. It was REJECTED on 2026-04-15 after the contamination
+  # concern was raised: `evo2_7b_init_70nt_pca4096` is a positional slice
+  # of a full-operon forward pass (extracted by
+  # evo2_7b_multiwindow_extract.py:203 — the model SEES the full operon and
+  # the "70-nt window" is a positional aggregation), and the +0.143 solo
+  # ρ_nc gap over the 1B standalone init feature shows that most or all of
+  # R2's +0.024 Tier B+ gain was operon-context contamination. A real
+  # Tier B+ user with only ≥35 nt of 5′ UTR cannot reproduce this feature.
+  #
+  # See §A.TIER_B_PLUS_CONTAMINATION_2026-04-15 for full provenance. The
+  # R2 result JSONs are kept on disk as a methodological reference.
+  #
+  # =============================================================================
+  # HISTORICAL / ABLATION ENTRY (do not use for deployment; kept for provenance)
+  # =============================================================================
+  #
+  # The R1 3-modality recipe (ESM-C + ProtT5-XL + Evo-2 7B init_70nt) at
+  # ρ_nc = 0.538 was the OLD Tier A+ entry (2026-04-11 to 2026-04-13).
+  # It was reclassified as a scientific ablation on 2026-04-13 after a
+  # coauthor review pointed out that no real user has "upstream DNA
+  # without the CDS that follows the ATG" — so the init-window-alone
+  # recipe is not a deployment contract, just an interesting ablation of
+  # the Tier B body. Superseded twice: first by R2 (2026-04-13), then by
+  # the clean replacement above (2026-04-15).
+  #
+  # The R1 ablation recipe file (tier_a_init60_evo2_7b_init_70nt_pca4096_
+  # prott5_seed42) is still on disk and referenced by historical audit
+  # entries. It should NOT be wired into any inference script.
+  #
+  # R1 per-fold ρ_nc: 0.5374, 0.5412, 0.5488, 0.5232, 0.5406
+  # R1 mean ± std: 0.5382 ± 0.0094
+  # R1 delta vs Tier A (ESM-C+ProtT5): +0.020, p = 0.0006, 5/5 wins
+  # =============================================================================
+
+  B_protein_cds:
+    description: "User provides protein sequence + CDS DNA (no upstream/UTR context)"
+    recipe: "deploy_protein_cds_features_6mod_seed42"
+    n_folds: 5
+    rho_nm: 0.5312
+    rho_nm_std: 0.0135
+    modalities: ["esmc_protein", "hyenadna_dna_cds", "codonfm_cds",
+                 "classical_codon", "classical_protein", "classical_disorder"]
+    classical_features: true
+    statistical_justification: >
+      Biophysical features add Δ=+0.007 (p=0.031, 5/5 wins) over 3-mod
+      PLM-only. Significant. Adding ProtT5-XL alone gives Δ=+0.007
+      (p=0.133, 3/5 wins ns) — not significant at the Tier B input
+      contract, so the simpler 6-modality recipe wins the lock.
+      Stacking BOTH ProtT5-XL and Evo-2 7B init_70nt on top of the
+      Tier B body gives Δ=+0.024 (p=0.0009, 5/5 wins) — but
+      evo2_7b_init_70nt_pca4096 requires ≥35 nt of 5′ UTR upstream of
+      ATG, which sits above the Tier B "CDS only" input contract. That
+      8-modality synergistic result (R2, ρ_nm=0.555) is therefore
+      promoted to its OWN tier, Tier B+ (internal key:
+      `A_plus_protein_init_window`, see above). Tier B remains at the
+      6-modality CDS-only recipe for users who do not have the UTR.
+    use_for:
+      - "When CDS DNA is available but NO upstream/UTR context"
+      - "Plasmid inserts without flanking sequence"
+
+  C_protein_operon:
+    description: >
+      User provides protein + CDS + genomic flanking context (≥100 nt
+      upstream of ATG + ≥50 nt downstream of stop). This matches the
+      training set's singleton padding: 95.3% of single-gene operons
+      (78.6% of training data) have exactly 100+50 nt flanking. 99.6%
+      of all 492K genes have ≥100+50 nt. Providing less context (e.g.,
+      only 35 nt upstream) produces a distribution shift in the
+      evo2_7b_full_operon mean-pool. Full multi-gene operons are also
+      in-distribution (21.4% of training data).
+    recipe: "evo2_prott5_seed42"
+    n_folds: 5
+    rho_nm: 0.5747
+    rho_nm_std: 0.0113
+    modalities: ["evo2_7b_full_operon_pca4096", "prot_t5_xl_protein"]
+    classical_features: false
+    statistical_justification: >
+      Evo-2 7B full_operon+ProtT5 (2 mod, ρ=0.575) is statistically
+      equivalent to the former hardhybrid 4-mod recipe (ρ=0.582,
+      Δ=+0.007 p=0.124 ns). By the simplest-not-worse rule the 2-mod
+      recipe wins. 4 mod → 2 mod with no statistical loss.
+      Adding init_70nt to full_operon+ProtT5 gives Δ=+0.0015 (p=0.648
+      ns) — flat (R3). The full_operon already captures the init region.
+      Window-swap to init_70nt (replacing full_operon) is Δ=−0.039
+      (p<0.0001) — significantly WORSE. The full operon context carries
+      cross-gene information that init_70nt does not.
+      Biophysical features at Tier C: UNTESTED with the ProtT5 lock.
+      Experiment pending (evo2_7b_full+ProtT5+5×classical, 7 mod).
+    minimum_context: "≥100 nt upstream of ATG + CDS + ≥50 nt downstream of stop"
+    context_note: >
+      Derived from training-set analysis (2026-04-10): 95.3% of singletons
+      have exactly 100+50 nt padding; 99.6% of all genes have ≥100+50.
+      Cambray constructs have 89 nt up + 0 nt down — mild distribution
+      shift for full_operon but within range for init_70nt (needs only 35 up).
+    use_for:
+      - "Native expression with genome annotation (annotated but no Bacformer)"
+      - "Plasmid/construct expression (Cambray, Aikium — provide ≥100 nt upstream)"
+      - "Any input where UTR/flanking context is available"
+
+  D_full_native:
+    description: "User provides protein + operon + host genome"
+    recipe: "balanced_nonmega_5mod"
+    n_folds: 5
+    rho_nm: 0.5904
+    rho_nm_std: 0.0121
+    modalities: ["evo2_7b_full_operon_pca4096", "hyenadna_dna_cds",
+                 "bacformer_large", "classical_codon", "classical_rna_init",
+                 "classical_protein", "classical_disorder",
+                 "classical_operon_struct", "esmc_protein"]
+    classical_features: true
+    statistical_justification: >
+      NM5 (9 mod with biophysical) beats central_dogma (4 mod PLM-only)
+      by Δ=+0.005 (p=0.030, 5/5 wins). Significant. Adding consensus
+      (11 mod) gives only Δ=+0.004 more (p=0.086, 4/5 wins). Not
+      significant. Adding ProtT5 gives Δ=+0.002 (p=0.404, 4/5 wins) —
+      not significant. NM5 is the simplest statistically justified champion.
+    use_for:
+      - "Native expression prediction with full genomic context"
+      - "LOSO evaluation, temporal holdout"
+
+# =============================================================================
+# Dataset → Tier mapping
+# =============================================================================
+
+dataset_tiers:
+  # In-distribution (native expression, full context)
+  li_2014_ribosome_profiling: D_full_native
+  mori_2021_dia_ms: D_full_native
+  taniguchi_2010_yfp: D_full_native
+  v21_temporal_holdout: D_full_native
+
+  # Heterologous expression (protein only)
+  boel_2016: A_protein_only
+  price_nesg_2011: A_protein_only
+  ssgcid_targettrack: A_protein_only
+
+  # Solubility cross-evaluation (protein only)
+  solubility_pure_expression: A_protein_only
+  solubility_pure_solubility: A_protein_only
+  solubility_mixed: A_protein_only
+
+  # Construct/plasmid expression (has UTR + CDS)
+  cambray_2018: C_protein_operon
+  designed_binders: A_protein_only  # no DNA in the dataset
+
+  # Extreme OOD (has full context, different phylum)
+  synechococcus: D_full_native
+
+# =============================================================================
+# Sequence form
+# =============================================================================
+
+sequence_form:
+  training: "gene_product"
+  description: >
+    Production embeddings extracted on gene-product-form sequences:
+    full ORF translation with initiator M, no tag stripping, no MetAP.
+    External eval embeddings MUST match this form.
+  normalization: >
+    For external proteins with expression tags: strip tag, keep M.
+    normalize_sequence(seq, apply_metap=False, ensure_m=True)

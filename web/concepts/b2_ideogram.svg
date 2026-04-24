@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="i2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#D4C5A0"/>
+      <stop offset="50%"  stop-color="#C9A961"/>
+      <stop offset="100%" stop-color="#A67C2B"/>
+    </linearGradient>
+    <radialGradient id="i2glow" cx="40%" cy="45%" r="55%">
+      <stop offset="0%"  stop-color="#C9A961" stop-opacity="0.22"/>
+      <stop offset="80%" stop-color="#C9A961" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" fill="#0F0F0F"/>
+  <rect width="400" height="400" fill="url(#i2glow)"/>
+  <!-- 合 (ai / gō — harmony, union) as a single brushstroke-styled character.
+       Uses SerifJP / Noto Serif JP if available; otherwise any CJK-capable font. -->
+  <text x="145" y="235" text-anchor="middle"
+        font-family="'Noto Serif JP', 'Yu Mincho', 'Hiragino Mincho Pro', serif"
+        font-size="170" font-weight="700" fill="url(#i2)">合</text>
+  <!-- Aiki wordmark beside it -->
+  <text x="245" y="200" text-anchor="start"
+        font-family="Playfair Display, Georgia, serif"
+        font-size="48" font-weight="700" fill="#FAFAF8">Aiki</text>
+  <text x="245" y="228" text-anchor="start"
+        font-family="Inter, sans-serif" font-size="11"
+        fill="#D4C5A0" letter-spacing="0.28em"
+        text-transform="uppercase">harmony · 合</text>
+  <text x="245" y="250" text-anchor="start"
+        font-family="Cormorant Garamond, serif" font-size="14"
+        fill="#B88A61" font-style="italic">the joining of many protein AIs</text>
+</svg>

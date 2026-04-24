@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#D4C5A0"/>
+      <stop offset="50%"  stop-color="#C9A961"/>
+      <stop offset="100%" stop-color="#A67C2B"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"  stop-color="#C9A961" stop-opacity="0.35"/>
+      <stop offset="70%" stop-color="#C9A961" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="0.6"/></filter>
+  </defs>
+  <rect width="400" height="400" fill="#0F0F0F"/>
+  <circle cx="200" cy="200" r="180" fill="url(#glow)"/>
+  <!-- Enso: a near-full circle with a small gap at ~30 degrees (top-right),
+       drawn with variable stroke to suggest a single brushstroke. -->
+  <path d="M 340 180
+           A 150 150 0 1 0 225 52
+           L 235 50
+           A 1 1 0 0 1 235 50"
+        fill="none" stroke="url(#gold)" stroke-width="14"
+        stroke-linecap="round" stroke-linejoin="round" filter="url(#soft)"/>
+  <!-- Tail flick for brushstroke feel -->
+  <path d="M 340 180 Q 355 200 340 225" fill="none"
+        stroke="url(#gold)" stroke-width="6" stroke-linecap="round" opacity="0.75"/>
+  <!-- Wordmark -->
+  <text x="200" y="215" text-anchor="middle"
+        font-family="Playfair Display, Georgia, serif"
+        font-size="52" font-weight="700" fill="#FAFAF8"
+        letter-spacing="0.04em">Aiki</text>
+  <text x="200" y="248" text-anchor="middle"
+        font-family="Inter, sans-serif" font-size="11"
+        fill="#D4C5A0" letter-spacing="0.32em"
+        text-transform="uppercase">AIKIUM</text>
+</svg>

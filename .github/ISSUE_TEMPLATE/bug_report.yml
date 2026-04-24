@@ -1,0 +1,79 @@
+name: Bug report
+description: Aiki-XP returned a wrong result, crashed, or behaved unexpectedly.
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please run through the FAQ first — many "bugs" turn out to be
+        [cold-start timing](https://github.com/aikium-public/aiki-xp#troubleshooting--faq),
+        [tagged sequences scored without stripping](https://github.com/aikium-public/aiki-xp#sequence-normalization-for-tagged-proteins),
+        or [missing host genomes](https://github.com/aikium-public/aiki-xp#troubleshooting--faq).
+
+  - type: dropdown
+    id: entry
+    attributes:
+      label: How were you running Aiki-XP?
+      options:
+        - Live demo (Modal web UI)
+        - Public API via curl / Python requests
+        - Colab notebook
+        - Docker image (:inference)
+        - Docker image (:full)
+        - pip install + local CPU/GPU
+      default: 0
+    validations:
+      required: true
+
+  - type: input
+    id: tier
+    attributes:
+      label: Which tier / endpoint?
+      placeholder: "e.g. Tier D (predict_tier_d_endpoint) or lookup_gene"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you see? What did you expect to see? Paste the response (redact sequences if sensitive).
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimum reproducer
+      description: >
+        A curl command, 3-line Python snippet, or Modal call that reliably produces the bug.
+        Include the host accession, the tier, and the mode (native / heterologous) if applicable.
+      render: bash
+      placeholder: |
+        curl -X POST https://aikium--aikixp-tier-a-lookup-gene.modal.run \
+          -H 'Content-Type: application/json' \
+          -d '{"gene_ids": ["..."]}'
+    validations:
+      required: true
+
+  - type: input
+    id: request-id
+    attributes:
+      label: Modal request ID (if from the web UI or API)
+      description: Check response headers for `modal-function-call-id` — helps us trace the exact container.
+      placeholder: "fc-01KPQ..."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting, I've confirmed
+      options:
+        - label: I retried after 30-60 s (rules out cold-start timeouts)
+          required: true
+        - label: I'm not scoring a tagged sequence with the tag intact
+          required: true
+        - label: The host organism is in the 1,831-genome cache (or I'm using Tier A which doesn't need one)
+          required: true
