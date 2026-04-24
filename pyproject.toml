@@ -39,9 +39,9 @@ extraction = [
 ]
 
 [project.urls]
-Paper = "https://doi.org/XXXXXXX"
+Paper = "https://doi.org/10.64898/2026.04.21.719525"
 Repository = "https://github.com/aikium-public/aiki-xp"
-Data = "https://doi.org/10.5281/zenodo.XXXXXXX"
+Data = "https://doi.org/10.5281/zenodo.19639621"
 
 [tool.setuptools.packages.find]
 include = ["aikixp*"]

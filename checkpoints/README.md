@@ -2,12 +2,12 @@
 
 Trained model checkpoints for all deployment tiers are hosted on Zenodo.
 
-**DOI:** `10.5281/zenodo.XXXXXXX`
+**DOI:** `10.5281/zenodo.19639621`
 
 ## Download
 
 ```bash
-zenodo_get 10.5281/zenodo.XXXXXXX -o checkpoints/
+zenodo_get 10.5281/zenodo.19639621 -o checkpoints/
 ```
 
 ## Available checkpoints

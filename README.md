@@ -2,7 +2,7 @@
 
 **Leakage-controlled multimodal prediction of within-species relative protein expression at pan-bacterial scale.**
 
-- 📄 **Paper:** Tien, Sharma Meda, Shastry & Mysore. *Nature Biotechnology* (2026, under review). Preprint: bioRxiv (DOI resolving after screening — see [BIORXIV/2026/719525](https://www.biorxiv.org/search/BIORXIV%2F2026%2F719525)).
+- 📄 **Paper:** Tien, Sharma Meda, Shastry & Mysore. *Nature Biotechnology* (2026, under review). Preprint: [bioRxiv 10.64898/2026.04.21.719525](https://doi.org/10.64898/2026.04.21.719525).
 - 📦 **Data + weights:** Zenodo DOI [10.5281/zenodo.19639621](https://doi.org/10.5281/zenodo.19639621) (23 files, 28.2 GB, CC-BY 4.0)
 - 🐳 **Docker:** `ghcr.io/aikium-public/aiki-xp:inference` (2 GB) and `:full` (10.7 GB)
 - 🌐 **Live demo:** https://aikium--aikixp-tier-a-landing-page.modal.run
@@ -281,7 +281,7 @@ Tiers A, B, C, D on Modal are unaffected.
   author  = {Tien, Hudson and Sharma Meda, Radheesh and Shastry, Shankar and Mysore, Venkatesh},
   journal = {Nature Biotechnology},
   year    = {2026},
-  note    = {Under review. Preprint available on bioRxiv.}
+  note    = {Under review. Preprint: bioRxiv \url{https://doi.org/10.64898/2026.04.21.719525}.}
 }
 
 @misc{tien2026aikixp_zenodo,

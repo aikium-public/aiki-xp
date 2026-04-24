@@ -2,7 +2,7 @@
 
 The training data and pre-extracted embeddings are hosted on Zenodo due to size (~50 GB total).
 
-**DOI:** `10.5281/zenodo.XXXXXXX`
+**DOI:** `10.5281/zenodo.19639621`
 
 ## Download
 
@@ -11,7 +11,7 @@ The training data and pre-extracted embeddings are hosted on Zenodo due to size 
 pip install zenodo_get
 
 # Download all files
-zenodo_get 10.5281/zenodo.XXXXXXX -o data/
+zenodo_get 10.5281/zenodo.19639621 -o data/
 ```
 
 ## Contents

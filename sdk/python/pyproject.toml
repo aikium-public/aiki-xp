@@ -40,7 +40,8 @@ test = ["pytest>=7.0"]
 Homepage = "https://github.com/aikium-public/aiki-xp"
 Repository = "https://github.com/aikium-public/aiki-xp"
 Documentation = "https://github.com/aikium-public/aiki-xp#readme"
-Paper = "https://doi.org/10.5281/zenodo.19639621"
+Paper = "https://doi.org/10.64898/2026.04.21.719525"
+Data = "https://doi.org/10.5281/zenodo.19639621"
 "Live demo" = "https://aikium--aikixp-tier-a-landing-page.modal.run"
 "Issue tracker" = "https://github.com/aikium-public/aiki-xp/issues"
 

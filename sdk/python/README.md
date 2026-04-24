@@ -129,6 +129,6 @@ Code: Apache 2.0. Aiki-XP model weights + data: CC-BY 4.0 (via
             Mysore, Venkatesh},
   journal = {Nature Biotechnology},
   year = {2026},
-  note = {Under review. Preprint on bioRxiv.}
+  note = {Under review. Preprint: bioRxiv \url{https://doi.org/10.64898/2026.04.21.719525}.}
 }
 ```
