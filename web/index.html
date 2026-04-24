@@ -1389,7 +1389,7 @@ h1, h2, h3, h4 {
             <input type="radio" id="tier-b" name="tier" value="B">
             <label for="tier-b">Tier B · ρ<sub>nc</sub>=0.531</label>
           </div>
-          <div class="radio-option" style="flex: 1 1 130px;opacity:0.5;" title="Tier B+ live inference is temporarily offline on this Modal deployment — see the footnote below.">
+          <div class="radio-option" style="flex: 1 1 130px;opacity:0.5;" title="Tier B+ live inference is not available in this demo — cached paper predictions remain available via /lookup_gene.">
             <input type="radio" id="tier-bp" name="tier" value="B+" disabled>
             <label for="tier-bp" style="cursor:not-allowed;">Tier B+*</label>
           </div>
@@ -1403,12 +1403,12 @@ h1, h2, h3, h4 {
           </div>
         </div>
         <div class="tier-info" id="tier-requirements">Tier D uses all five modalities (protein + CDS + host genome).</div>
-        <div class="tier-info" style="margin-top:4px;opacity:0.65;font-size:0.78rem;">* Tier B+ live inference is offline on this Modal deployment (Evo-2 1B requires Transformer Engine, which won't build on Modal's image). Cached paper ρ<sub>nc</sub>=0.543 remains available via <code>/lookup_gene</code>.</div>
+        <div class="tier-info" style="margin-top:4px;opacity:0.65;font-size:0.78rem;">* Tier B+ live inference is not available in this demo. The paper's cached ρ<sub>nc</sub> = 0.543 predictions are served from <code>/lookup_gene</code>.</div>
       </div>
 
       <div class="button-row">
         <button type="submit" class="submit-btn" id="submit-btn">Run prediction</button>
-        <button type="button" class="submit-btn submit-btn-secondary" id="compare-btn" title="Fires Tier A, B, C, and D in parallel and shows the tier ladder. Tier B+ is temporarily offline for correction and is skipped.">Compare tiers A, B, C, D</button>
+        <button type="button" class="submit-btn submit-btn-secondary" id="compare-btn" title="Fires Tier A, B, C, and D in parallel and shows the tier ladder.">Compare tiers A, B, C, D</button>
         <button type="button" class="submit-btn submit-btn-secondary" id="prewarm-btn" title="Fires one small request to each GPU tier to wake the Modal containers before you submit. Optional — use it when you know you're about to run and want to avoid cold-start waits." style="max-width:140px;">🔥 Pre-warm</button>
       </div>
       <div id="stale-results-warn" class="stale-results-warn" style="display:none;">
@@ -1634,7 +1634,7 @@ h1, h2, h3, h4 {
   <!-- =================== LIMITATIONS =================== -->
   <div class="limitations-panel">
     <h2 class="section-title" style="margin-bottom:8px;">Where Aiki-XP works — and where it doesn't</h2>
-    <p class="section-sub">Honesty up front. These are the known limits of this release.</p>
+    <p class="section-sub">Known limits of this release.</p>
     <div class="limits-grid">
       <div class="limit-card limit-works">
         <div class="limit-head">✓ Works well for</div>
@@ -1677,21 +1677,14 @@ h1, h2, h3, h4 {
     Paper training totals: XP5 360 A100-h (5 folds × 72 h) + embedding extraction ~1000 A100-h across Evo-2, Bacformer, ESM-C / ProtT5 / HyenaDNA. Full traces: Zenodo.
   </p>
 
-  <!-- Reproducibility: pointer to Colab, not an in-browser button.
-       The in-browser 500-row sampler was removed because per-fold SD at
-       n=500 (~0.16) made the "reproduction" look noisier than the paper's
-       ±0.012 — undercutting rather than confirming the headline numbers.
-       Full reproduction belongs in the Colab notebook (or locally against
-       the Zenodo parquet), where n=244K drops SD to the paper's band. -->
   <p class="compute-footnote" style="max-width:760px;">
     <strong>Reproducibility.</strong> The paper's 244,002 held-out 5-fold CV
-    predictions are public via <code>POST /lookup_gene</code> and the Zenodo
+    predictions are available via <code>POST /lookup_gene</code> and the Zenodo
     archive (<a href="https://doi.org/10.5281/zenodo.19639621" style="color:var(--primary-gold);">10.5281/zenodo.19639621</a>).
     To reproduce the headline per-fold Spearman ρ_nm = 0.590 ± 0.012 (Tier D)
     against the full corpus, run the
     <a href="https://colab.research.google.com/github/aikium-public/aiki-xp/blob/main/notebooks/aiki_xp_colab_quickstart.ipynb" style="color:var(--primary-gold);">Colab quickstart notebook</a>
-    (free-tier, CPU, ~3 min). Any smaller in-browser subsample is too noisy
-    to confirm the paper's error bars.
+    (free-tier, CPU, ~3 min).
   </p>
 
   <!-- =================== ABSTRACT =================== -->
@@ -1715,7 +1708,7 @@ h1, h2, h3, h4 {
     <dt>Operon</dt>
     <dd>A cluster of bacterial genes co-transcribed from a single promoter into a single mRNA. Neighboring genes in the same operon often share regulatory fate.</dd>
     <dt>Tier D, a.k.a. XP5 (paper configuration)</dt>
-    <dd>The full 5-modality Aiki-XP model. The paper refers to this configuration as "XP5" — both because it fuses <em>5 biological modalities</em> (genome context via Bacformer-large, operon architecture via Evo-2 7B, CDS composition via HyenaDNA, protein identity via ESM-C, and per-gene biophysical features) and because it is evaluated under <em>5-fold cross-validation</em>. The biophysical modality is itself the concatenation of five feature blocks (codon usage, protein properties, disorder, operon structure, RNA folding) — an internal implementation detail that we count as one modality in the paper's framing.</dd>
+    <dd>The full 5-modality Aiki-XP model. The paper calls this configuration "XP5" — it fuses <em>5 biological modalities</em> (genome context via Bacformer-large, operon architecture via Evo-2 7B, CDS composition via HyenaDNA, protein identity via ESM-C, and per-gene biophysical features, where the biophysical modality aggregates codon usage, protein properties, disorder, operon structure, and RNA folding) and is evaluated under <em>5-fold cross-validation</em>.</dd>
     <dt>Native vs. heterologous</dt>
     <dd>Native: your CDS exists in the chosen host genome, so Aiki-XP uses its real operon context. Heterologous: your CDS is foreign to the host; we wrap it in the host's lacZ promoter-CDS-terminator context, reflecting a common recombinant-expression protocol.</dd>
     <dt>Gene-operon split</dt>
@@ -1767,7 +1760,7 @@ h1, h2, h3, h4 {
   <div class="footer">
     <a href="https://github.com/aikium-public/aiki-xp" target="_blank" rel="noopener">GitHub</a>·
     <a href="https://doi.org/10.5281/zenodo.19639621" target="_blank" rel="noopener">Data (Zenodo)</a>·
-    <a href="#" target="_blank" rel="noopener" id="paper-link">bioRxiv preprint</a>·
+    <a href="https://www.biorxiv.org/search/BIORXIV%2F2026%2F719525" target="_blank" rel="noopener" id="paper-link">bioRxiv preprint</a>·
     <a href="https://github.com/aikium-public/aiki-xp/blob/main/ROADMAP.md" target="_blank" rel="noopener">Roadmap</a>·
     <a href="https://github.com/aikium-public/aiki-xp/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>·
     <a href="https://www.aikium.com" target="_blank" rel="noopener">Aikium</a>·
@@ -1857,16 +1850,10 @@ function updateHostStats() {
   // Hero stat — compact
   const hero = document.getElementById('hero-hosts-stat');
   if (hero) hero.innerHTML = `<strong>${total.toLocaleString()}</strong> host genomes`;
-  // Footer breakdown — detailed
+  // Footer breakdown — simple
   const breakdown = document.getElementById('host-cache-breakdown');
   if (breakdown) {
-    const parts = [
-      `${total.toLocaleString()} hosts`,
-      `${baseline.toLocaleString()} training corpus`,
-      `${bulk.toLocaleString()} extended cache`,
-    ];
-    if (user > 0) parts.push(`${user.toLocaleString()} user-added`);
-    breakdown.textContent = parts.join(' · ');
+    breakdown.textContent = `${total.toLocaleString()} bacterial reference genomes`;
   }
 }
 function searchHosts(q) {
@@ -3079,14 +3066,11 @@ if (findHostBtn) {
       clearInterval(tickInt);
       const top = nbData.hits[0];
       const topSpecies = top.species;
-      // Try 3 match strategies:
+      // Try 3 match strategies, from most precise to most forgiving:
       //   a) Exact species-key include  ("Escherichia_coli_K12" in species_keys)
       //   b) Underscored species string matches first token of host.name
       //   c) Host name contains the de-underscored species string
-      // The user reported a case where (a) silently failed even though
-      // species_keys DID contain the target; adding (b) and (c) makes the
-      // match robust to future data drift (e.g. missing species_keys on
-      // bulk-added entries).
+      // Strategies (b) and (c) cover hosts that lack `species_keys` metadata.
       let host = null;
       let matchedVia = null;
       if (topSpecies && HOSTS && HOSTS.length) {
@@ -3285,10 +3269,10 @@ form.addEventListener('submit', async (e) => {
     document.getElementById('result-operon-source').textContent = data.predictions?.[0]?.operon_source || '—';
     document.getElementById('result-operon-length').textContent = data.predictions?.[0]?.operon_length_nt || '—';
 
-    // Honest disclosure: if user requested native mode but the CDS wasn't
-    // found exactly in the host genome, the backend silently falls back to
-    // heterologous (lacZ context). Surface this as a visible warning so the
-    // prediction isn't mistaken for a true native-operon estimate.
+    // If the user requested native mode but the CDS wasn't found in the host
+    // genome, the backend falls back to heterologous (lacZ context). Surface
+    // that as a visible warning so the prediction isn't mistaken for a true
+    // native-operon estimate.
     const usedOperon = data.predictions?.[0]?.operon_source;
     const nativeFallbackWarn = document.getElementById('native-fallback-warn');
     if (tier !== 'A' && mode === 'native' && usedOperon === 'heterologous') {
@@ -3403,10 +3387,8 @@ const tierComparePanel = document.getElementById('tier-compare-panel');
 const tierCompareTbody = document.getElementById('tier-compare-tbody');
 const tierCompareNarrative = document.getElementById('tier-compare-narrative');
 
-// Tier B+ is temporarily disabled while we fix an extractor / checkpoint dim
-// mismatch (deployed was feeding Evo-2 7B features into a 1B-trained adapter,
-// silently truncated by the ensemble). See the landing page's visible
-// banner explaining the correction.
+// Tier B+ live inference is not available in this demo; cached paper
+// predictions remain accessible via /lookup_gene.
 const TIER_COMPARE_META = {
   A:      { url: TIER_A_URL,      label: 'Tier A',  mods: 'ESM-C + ProtT5',
             stages: [
@@ -3434,7 +3416,7 @@ const TIER_COMPARE_META = {
               { after: 120, msg: 'still warming — first Tier D on a cold host takes 2-3 min…' },
             ] },
 };
-const TIER_COMPARE_ORDER = ['A', 'B', 'C', 'D'];   // B+ omitted pending correction
+const TIER_COMPARE_ORDER = ['A', 'B', 'C', 'D'];
 
 function stageMessageFor(tier, elapsedSec) {
   const stages = TIER_COMPARE_META[tier]?.stages || [];
@@ -3524,12 +3506,11 @@ compareBtn.addEventListener('click', async () => {
   if (strucPanel) strucPanel.style.display = 'none';
   if (dissectPanel) dissectPanel.style.display = 'none';
 
-  // Render skeleton rows immediately so user sees progress.
-  // Each skeleton has an inline "running… Xs" counter that ticks every second
-  // (cold Tier B+ can legitimately take 100 s; without a ticker it looks hung).
+  // Render skeleton rows immediately so the user sees progress; an inline
+  // "running… Xs" counter ticks every second so cold starts don't look hung.
   tierComparePanel.style.display = 'block';
   tierCompareTbody.innerHTML = '';
-  const tiers = TIER_COMPARE_ORDER;   // Tier B+ skipped while correction is in flight
+  const tiers = TIER_COMPARE_ORDER;
   const tierStartedAt = {};
   const tierDone = {};
   const rowId = t => `tc-row-${t.replace('+', 'p')}`;
@@ -3565,8 +3546,7 @@ compareBtn.addEventListener('click', async () => {
   const nTiers = tiers.length;
   progressBanner.innerHTML =
     `<strong>0/${nTiers}</strong> tiers returned · 0s elapsed &nbsp;·&nbsp; ` +
-    `<span style="opacity:0.85;">warm target: ~10-15 s total; cold target: ~60-120 s (Evo-2 7B loads)</span> &nbsp;·&nbsp; ` +
-    `<span style="opacity:0.75;">Tier B+ skipped — under correction</span>`;
+    `<span style="opacity:0.85;">warm target: ~10-15 s total; cold target: ~60-120 s (Evo-2 7B loads)</span>`;
 
   // Ticking interval: updates each still-running row's "Xs" counter + the
   // top banner's aggregate progress + appends a cold-start hint at 90 s.
@@ -3630,8 +3610,7 @@ compareBtn.addEventListener('click', async () => {
     const okCount = tiers.length - errs.length;
     progressBanner.textContent = `Complete — ${okCount}/${nTiers} tiers succeeded` +
       (errs.length ? ` · errors: ${errs.join(', ')}` : '') +
-      ` · ${Math.floor((Date.now() - t0) / 1000)}s total` +
-      ` (Tier B+ skipped — under correction)`;
+      ` · ${Math.floor((Date.now() - t0) / 1000)}s total`;
   }
 
   // Render bar chart of all 5 predictions
@@ -3674,8 +3653,8 @@ compareBtn.addEventListener('click', async () => {
         if (parts.length) narrative += 'Dominant contributions: ' + parts.join(', ') + '.';
       }
     }
-    // Honest disclosure: if user requested native mode but the backend
-    // silently fell back to heterologous (CDS not found exactly in host), say so.
+    // If the user requested native mode but the backend fell back to
+    // heterologous (CDS not found exactly in host), flag it in the narrative.
     const requestedMode = mode;
     const anyFellBack = ['B','B+','C','D'].some(t => {
       const r = tierResults[t];
