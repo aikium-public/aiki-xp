@@ -15,7 +15,6 @@ from ._constants import DEFAULT_ENDPOINTS, DEFAULT_TIMEOUT_S
 from ._types import (
     CdsForProteinResponse,
     FindInCorpusResponse,
-    LookupGeneResponse,
     PredictionResponse,
     SampleLookupResponse,
     SpeciesScatterResponse,
@@ -58,7 +57,7 @@ class Client:
             self._urls.update(base_urls)
         self._timeout_override = timeout
         self._s = session or requests.Session()
-        self._s.headers.setdefault("User-Agent", "aikixp-client/1.0.0 python-requests")
+        self._s.headers.setdefault("User-Agent", "aikixp-client/1.1.0 python-requests")
 
     # -------------- internals --------------
 
@@ -85,16 +84,6 @@ class Client:
         return r.json()
 
     # -------------- corpus lookup --------------
-
-    def lookup_gene(self, gene_id: Union[str, Sequence[str]]) -> LookupGeneResponse:
-        """Look up one or more genes in the 244K held-out CV prediction corpus.
-
-        ``gene_id`` is formatted as ``<species_key>|<protein_id>``, e.g.
-        ``Escherichia_coli_K12|NP_417556.2``. Returns all 5-tier predictions
-        plus ``is_mega`` / ``cv_fold`` metadata for each match.
-        """
-        ids = [gene_id] if isinstance(gene_id, str) else list(gene_id)
-        return self._post(self._urls["lookup_gene"], {"gene_ids": ids})
 
     def sample_lookup(self, n: int = 5000, seed: int = 42) -> SampleLookupResponse:
         """Random sample ``n`` rows from the 244K held-out CV predictions.
@@ -180,32 +169,11 @@ class Client:
         }
         return self._post(self._urls[url_key], payload, kind="gpu")
 
-    def predict_tier_b(
-        self, protein: Union[str, Sequence[str]], cds: Union[str, Sequence[str]],
-        host: str, mode: str = "native", anchor: str = "lacZ",
-    ) -> PredictionResponse:
-        """Tier B prediction (+ HyenaDNA + classical codon/protein/disorder). ρ_nc ≈ 0.531."""
-        return self._predict_gpu("tier_b", protein, cds, host, mode, anchor)
-
-    def predict_tier_b_plus(
-        self, protein: Union[str, Sequence[str]], cds: Union[str, Sequence[str]],
-        host: str, mode: str = "native", anchor: str = "lacZ",
-    ) -> PredictionResponse:
-        """Tier B+ prediction (+ Evo-2 7B init-70nt window + RNA init). ρ_nc ≈ 0.543."""
-        return self._predict_gpu("tier_b_plus", protein, cds, host, mode, anchor)
-
-    def predict_tier_c(
-        self, protein: Union[str, Sequence[str]], cds: Union[str, Sequence[str]],
-        host: str, mode: str = "native", anchor: str = "lacZ",
-    ) -> PredictionResponse:
-        """Tier C prediction (+ Evo-2 7B full operon). ρ_nc ≈ 0.575."""
-        return self._predict_gpu("tier_c", protein, cds, host, mode, anchor)
-
     def predict_tier_d(
         self, protein: Union[str, Sequence[str]], cds: Union[str, Sequence[str]],
         host: str, mode: str = "native", anchor: str = "lacZ",
     ) -> PredictionResponse:
-        """Tier D prediction (XP5 ensemble, 9 modalities, Bacformer-large). ρ_nc ≈ 0.590.
+        """Tier D prediction (XP5 ensemble, 5 modalities, Bacformer-large). ρ_nc ≈ 0.590.
 
         This is the paper's headline recipe. Cold-start ~90 s; warm ~5 s per sequence.
         Batch multiple proteins/cds in one call to amortise the GPU cost.
@@ -214,16 +182,19 @@ class Client:
 
     # -------------- convenience --------------
 
-    def compare_all_tiers(
+    def compare_a_vs_d(
         self,
         protein: str,
         cds: str,
         host: str,
         mode: str = "native",
     ) -> Dict[str, PredictionResponse]:
-        """Fire Tier A/B/B+/C/D in parallel (thread pool) and return a dict keyed by tier.
+        """Fire Tier A and Tier D in parallel (thread pool) and return a dict keyed by tier.
 
         Clock time ≈ max(tier latencies). Cold ~90 s, warm ~10 s.
+        The intermediate tiers from the paper are scientific control conditions
+        whose cached predictions live on the Zenodo deposit
+        (https://doi.org/10.5281/zenodo.19639621), not as live endpoints.
         """
         from concurrent.futures import ThreadPoolExecutor
 
@@ -231,12 +202,10 @@ class Client:
             try:
                 if tier == "A":
                     return tier, self.predict_tier_a(protein)
-                method = {"B": self.predict_tier_b, "B+": self.predict_tier_b_plus,
-                          "C": self.predict_tier_c, "D": self.predict_tier_d}[tier]
-                return tier, method(protein, cds, host, mode=mode)
+                return tier, self.predict_tier_d(protein, cds, host, mode=mode)
             except AikixpError as e:
                 return tier, e
 
-        with ThreadPoolExecutor(max_workers=5) as ex:
-            results = dict(ex.map(_run, ["A", "B", "B+", "C", "D"]))
+        with ThreadPoolExecutor(max_workers=2) as ex:
+            results = dict(ex.map(_run, ["A", "D"]))
         return results

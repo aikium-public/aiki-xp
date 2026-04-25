@@ -488,13 +488,9 @@ def landing_page():
             "protein_id": matched_pid,
             "species": row["species"],
             "truth": float(row["true_expression"]),
-            "tier_a_cv": float(row["tier_a_prediction"]),
-            "tier_b_cv": float(row["tier_b_prediction"]),
-            "tier_b_plus_cv": float(row["tier_b_plus_prediction"]),
-            "tier_c_cv": float(row["tier_c_prediction"]),
-            "tier_d_cv": float(row["tier_d_prediction"]),
             "is_mega": bool(row["is_mega"]),
             "cv_fold": int(row["cv_fold"]),
+            "paper_predictions_at": "https://doi.org/10.5281/zenodo.19639621",
         }
 
     # ---- find_neighbors ----
@@ -1258,130 +1254,6 @@ class AikixpTierA:
             "dim_full": int(esmc_1152.shape[0]),
             "dim_pca": int(pca128.shape[0]),
         }
-
-
-# ── Lookup endpoint: all 5 tiers for any of the 244K test genes ────────────
-
-lookups_volume = modal.Volume.from_name("aikixp-lookups", create_if_missing=True)
-
-# Per-container in-memory rate limiter + shared partnership 429 body for
-# /lookup_gene. Scraping the 244K CV corpus via this endpoint is the obvious
-# abuse vector (every row carries PaxDB/Abele truth + 5-tier CV). Cap the
-# batch size to 20 IDs/call and 120 calls/hour/IP — interactive use is fine,
-# systematic scraping runs into walls quickly.
-import threading as _lg_threading
-_LOOKUP_GENE_LOCK = _lg_threading.Lock()
-_LOOKUP_GENE_COUNTS: dict = {}  # (ip, hour_bucket) -> count
-_LOOKUP_GENE_CAP_PER_HOUR = 120
-_LOOKUP_GENE_BATCH_CAP = 20
-
-
-def _lookup_gene_check_rate(ip: str) -> tuple[bool, int]:
-    import time as _t
-    hour_bucket = int(_t.time()) // 3600
-    with _LOOKUP_GENE_LOCK:
-        for k in list(_LOOKUP_GENE_COUNTS.keys()):
-            if k[1] != hour_bucket:
-                _LOOKUP_GENE_COUNTS.pop(k, None)
-        key = (ip, hour_bucket)
-        count = _LOOKUP_GENE_COUNTS.get(key, 0)
-        if count >= _LOOKUP_GENE_CAP_PER_HOUR:
-            return False, count
-        _LOOKUP_GENE_COUNTS[key] = count + 1
-        return True, count + 1
-
-
-@app.function(
-    image=tier_ab_image,
-    volumes={"/lookups": lookups_volume},
-    timeout=60,
-    memory=2048,
-)
-@modal.fastapi_endpoint(method="POST")
-async def lookup_gene(request: "fastapi.Request") -> dict:
-    """Return pre-computed Tier A/B/B+/C/D predictions for a gene_id in the 244K CV test set.
-
-    Sized for interactive single-gene queries. Batch of up to 20 gene_ids/call;
-    120 calls/hour per IP. For bulk access see https://doi.org/10.5281/zenodo.19639621.
-    """
-    import pandas as pd
-
-    xff = request.headers.get("x-forwarded-for")
-    ip = (xff.split(",")[0].strip() if xff else "unknown")
-    ok, _ = _lookup_gene_check_rate(ip)
-    if not ok:
-        return {
-            "error": "rate_limit_exceeded",
-            "endpoint": "lookup_gene",
-            "cap_per_hour": _LOOKUP_GENE_CAP_PER_HOUR,
-            "message": (
-                f"You've hit the interactive-use rate limit for lookup_gene "
-                f"({_LOOKUP_GENE_CAP_PER_HOUR} requests/hour per IP).\n\n"
-                "Running Aiki-XP at scale? We'd love to talk.\n"
-                "  → Partnership inquiries: partnerships@aikium.com\n"
-                "  → Full 492K corpus (properly citable): "
-                "https://doi.org/10.5281/zenodo.19639621\n"
-                "  → Local Docker image: ghcr.io/aikium-public/aiki-xp:inference\n"
-            ),
-            "partnerships_contact": "partnerships@aikium.com",
-            "bulk_data_doi": "10.5281/zenodo.19639621",
-            "results": [],
-        }
-
-    try:
-        payload = await request.json()
-    except Exception as e:
-        return {"error": f"Could not parse JSON body: {e}", "results": []}
-
-    ids = payload.get("gene_ids")
-    if ids is None:
-        single = payload.get("gene_id")
-        ids = [single] if single else []
-    if not ids:
-        return {"error": "Provide gene_id or gene_ids", "results": []}
-    if len(ids) > _LOOKUP_GENE_BATCH_CAP:
-        return {
-            "error": f"gene_ids list capped at {_LOOKUP_GENE_BATCH_CAP} per request. "
-                     f"Got {len(ids)}. For bulk access see "
-                     "https://doi.org/10.5281/zenodo.19639621, or email "
-                     "partnerships@aikium.com for a high-volume API key.",
-            "results": [],
-        }
-
-    df = pd.read_parquet("/lookups/tier_predictions_lookup.parquet")
-    hits = df[df["gene_id"].isin(ids)]
-    missing = [g for g in ids if g not in set(hits["gene_id"])]
-
-    results = []
-    for _, row in hits.iterrows():
-        results.append({
-            "gene_id": row["gene_id"],
-            "species": row["species"],
-            "is_mega": bool(row["is_mega"]),
-            "cv_fold": int(row["cv_fold"]),
-            "tier_a": float(row["tier_a_prediction"]),
-            "tier_b": float(row["tier_b_prediction"]),
-            "tier_b_plus": float(row["tier_b_plus_prediction"]),
-            "tier_c": float(row["tier_c_prediction"]),
-            "tier_d": float(row["tier_d_prediction"]),
-            "true_expression": float(row["true_expression"]),
-        })
-
-    return {
-        "n_found": len(results),
-        "n_missing": len(missing),
-        "missing_gene_ids": missing[:20],
-        "note": (
-            "Held-out 5-fold CV predictions (each gene scored by the fold "
-            "where it was held out). `is_mega` = conservation annotation "
-            "(True = member of a large cross-species cluster); `species` = "
-            "gene's source organism; `cv_fold` = the fold where this gene "
-            "was held out. To reproduce manuscript numbers, group by "
-            "`cv_fold` and average Spearman across folds — "
-            "e.g. Tier D rho_non_mega = 0.5904 +/- 0.0121."
-        ),
-        "results": results,
-    }
 
 
 # ── Utility endpoint: auto-fill CDS from protein + host ─────────────────────

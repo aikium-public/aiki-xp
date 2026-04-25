@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "aikixp-client"
-version = "1.0.0"
+version = "1.1.0"
 description = "Official Python client for the Aiki-XP bacterial protein-expression prediction API (Aikium, Inc.)."
 readme = "README.md"
 requires-python = ">=3.9"

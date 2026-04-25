@@ -10,12 +10,8 @@
 set -u
 
 LANDING='https://aikium--aikixp-tier-a-landing-page.modal.run'
-LOOKUP_GENE='https://aikium--aikixp-tier-a-lookup-gene.modal.run'
 CDS_FOR_PROTEIN='https://aikium--aikixp-tier-a-cds-for-protein.modal.run'
 TIER_A='https://aikium--aikixp-tier-a-predict-fasta.modal.run'
-TIER_B='https://aikium--aikixp-tier-d-predict-tier-b-endpoint.modal.run'
-TIER_B_PLUS='https://aikium--aikixp-tier-d-predict-tier-b-plus-endpoint.modal.run'
-TIER_C='https://aikium--aikixp-tier-d-predict-tier-c-endpoint.modal.run'
 TIER_D='https://aikium--aikixp-tier-d-predict-tier-d-endpoint.modal.run'
 
 GREEN='\033[0;32m'
@@ -68,7 +64,7 @@ hit() {
   check "$label" PASS "$elapsed" "HTTP 200 · valid payload"
 }
 
-header "CPU endpoints (landing + lookup + cds_for_protein + Tier A)"
+header "CPU endpoints (landing + cds_for_protein + Tier A)"
 
 # Landing page returns HTML, not JSON — check for "Aiki-XP" in the body.
 t0=$(date +%s.%N)
@@ -82,9 +78,6 @@ fi
 
 hit "hosts.json"     "$LANDING/hosts.json"     "" \
   "isinstance(d, list) and len(d) >= 1800"
-
-hit "lookup_gene"    "$LOOKUP_GENE"    '{"gene_ids":["Escherichia_coli_K12|NP_417556.2"]}' \
-  'd["n_found"] == 1 and "tier_d" in d["results"][0]'
 
 hit "cds_for_protein" "$CDS_FOR_PROTEIN" "{\"protein\":\"$PROT\",\"host\":\"NC_000913.3\"}" \
   '"cds" in d and "source" in d'
@@ -103,7 +96,7 @@ hit "find_in_corpus" "$LANDING/find_in_corpus" \
 hit "tier_a"         "$TIER_A"         '{"fasta":">q\nMKTVRQERLKSIVRILERSKEPVSGAQLAEELSVSRQVIVQDIAYLRSLGYNIVATPRGYVLAGGPGLGLNHVGQIIR\n"}' \
   'd["predictions"][0]["predicted_expression"] is not None'
 
-header "GPU endpoints (Tier B / B+ / C / D) — first call may cold-start"
+header "GPU endpoint (Tier D — first call may cold-start)"
 
 # Construct the GPU payload once.
 GPU_PAYLOAD=$(python3 -c "
@@ -117,14 +110,8 @@ print(json.dumps({
 }))
 ")
 
-hit "tier_b"      "$TIER_B"      "$GPU_PAYLOAD" \
-  'd["predictions"][0]["predicted_expression"] is not None'
-hit "tier_b_plus" "$TIER_B_PLUS" "$GPU_PAYLOAD" \
-  'd.get("error") == "tier_b_plus_live_inference_unavailable"'
-hit "tier_c"      "$TIER_C"      "$GPU_PAYLOAD" \
-  'd["predictions"][0]["predicted_expression"] is not None'
 hit "tier_d"      "$TIER_D"      "$GPU_PAYLOAD" \
-  'd["predictions"][0]["predicted_expression"] is not None and len(d["modalities_filled"]) == 9'
+  'd["predictions"][0]["predicted_expression"] is not None and len(d["modalities_filled"]) >= 5'
 
 printf "\n${YELLOW}━━━ SUMMARY ━━━${NC}\n"
 printf "  ${GREEN}PASS${NC}: %d  ${RED}FAIL${NC}: %d\n" "$PASS" "$FAIL"

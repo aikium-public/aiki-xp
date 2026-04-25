@@ -19,33 +19,12 @@ class Prediction(TypedDict, total=False):
 class PredictionResponse(TypedDict, total=False):
     mode: str                            # "native" | "heterologous"
     host: str
-    tier: str                            # "A" | "B" | "B+" | "C" | "D"
+    tier: str                            # "A" | "D"
     recipe: str
     n_sequences: int
     predictions: List[Prediction]
     modalities_filled: List[str]
     modalities_zero_filled: List[str]
-
-
-class GeneLookup(TypedDict, total=False):
-    gene_id: str
-    species: str
-    is_mega: bool
-    cv_fold: int
-    true_expression: float
-    tier_a: float
-    tier_b: float
-    tier_b_plus: float
-    tier_c: float
-    tier_d: float
-
-
-class LookupGeneResponse(TypedDict):
-    n_found: int
-    n_missing: int
-    missing_gene_ids: List[str]
-    note: str
-    results: List[GeneLookup]
 
 
 class CdsForProteinResponse(TypedDict, total=False):
@@ -74,8 +53,10 @@ class SpeciesScatterResponse(TypedDict, total=False):
 class FindInCorpusResponse(TypedDict, total=False):
     matched: bool
     gene_id: Optional[str]
+    protein_id: Optional[str]
+    species: Optional[str]
     truth: Optional[float]
-    tier_d_cv: Optional[float]
     cv_fold: Optional[int]
     is_mega: Optional[bool]
+    paper_predictions_at: Optional[str]
     reason: Optional[str]

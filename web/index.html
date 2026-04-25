@@ -1298,16 +1298,16 @@ h1, h2, h3, h4 {
     <div class="example-row">
       <span class="example-label">Example by input type:</span>
       <button class="example-btn" data-ex="protein_only" title="Protein sequence only. Selects Tier A (no CDS, no host needed).">Protein AA only (Tier A)</button>
-      <button class="example-btn" data-ex="protein_cds" title="Protein + CDS. Selects Tier B — heterologous-mode prediction in the default host.">Protein + CDS (Tier B)</button>
+      <button class="example-btn" data-ex="protein_cds" title="Protein + CDS. Runs Tier D in heterologous mode against the default E. coli host.">Protein + CDS (Tier D heterologous)</button>
       <button class="example-btn" data-ex="full" title="Protein + CDS + host + native mode. Selects Tier D (5 modalities: protein, DNA, classical biophysics, operon, genome — paper's champion recipe).">Everything (Tier D, native)</button>
     </div>
 
     <div class="framing" style="margin: 8px 0 24px; font-size: 0.98rem;">
-      <strong>Already a known gene?</strong> If your protein is one of the 244,002 CV test-split genes
-      from the paper, skip this form and query
-      <a href="https://aikium--aikixp-tier-a-lookup-gene.modal.run" style="color:var(--primary-gold);" target="_blank" rel="noopener">/lookup_gene</a>
-      for the exact held-out prediction (the number the paper reports). This form runs live inference
-      — useful for novel proteins, and for sanity-checking the pipeline.
+      <strong>This form runs live inference.</strong> The paper's 244,002 held-out 5-fold CV
+      predictions for every gene in the training corpus are on
+      <a href="https://doi.org/10.5281/zenodo.19639621" style="color:var(--primary-gold);" target="_blank" rel="noopener">Zenodo</a>
+      and reproducible via the
+      <a href="https://colab.research.google.com/github/aikium-public/aiki-xp/blob/main/notebooks/aiki_xp_colab_quickstart.ipynb" style="color:var(--primary-gold);" target="_blank" rel="noopener">Colab quickstart</a>.
     </div>
 
 
@@ -1379,23 +1379,11 @@ h1, h2, h3, h4 {
       </div>
 
       <div class="form-field">
-        <label>Prediction tier <span class="info" tabindex="0" data-tip="The five deployment tiers differ in which inputs they consume. A needs only a protein; B adds CDS-derived biophysical features; C adds operon DNA; D adds whole-genome context. Higher tiers → higher accuracy but more inputs required.">?</span></label>
+        <label>Prediction tier <span class="info" tabindex="0" data-tip="Tier A needs only a protein sequence (CPU). Tier D (the paper's XP5 champion) uses all five modalities — protein, CDS, classical biophysics, operon DNA, and host genome (GPU). The intermediate tiers from the paper are scientific control conditions and are served from the Zenodo deposit.">?</span></label>
         <div class="radio-group" style="flex-wrap: wrap;">
           <div class="radio-option" style="flex: 1 1 130px;">
             <input type="radio" id="tier-a" name="tier" value="A">
             <label for="tier-a">Tier A · ρ<sub>nc</sub>=0.518</label>
-          </div>
-          <div class="radio-option" style="flex: 1 1 130px;">
-            <input type="radio" id="tier-b" name="tier" value="B">
-            <label for="tier-b">Tier B · ρ<sub>nc</sub>=0.531</label>
-          </div>
-          <div class="radio-option" style="flex: 1 1 130px;opacity:0.5;" title="Tier B+ live inference is not available in this demo — cached paper predictions remain available via /lookup_gene.">
-            <input type="radio" id="tier-bp" name="tier" value="B+" disabled>
-            <label for="tier-bp" style="cursor:not-allowed;">Tier B+*</label>
-          </div>
-          <div class="radio-option" style="flex: 1 1 130px;">
-            <input type="radio" id="tier-c" name="tier" value="C">
-            <label for="tier-c">Tier C · ρ<sub>nc</sub>=0.575</label>
           </div>
           <div class="radio-option" style="flex: 1 1 130px;">
             <input type="radio" id="tier-d" name="tier" value="D" checked>
@@ -1403,13 +1391,12 @@ h1, h2, h3, h4 {
           </div>
         </div>
         <div class="tier-info" id="tier-requirements">Tier D uses all five modalities (protein + CDS + host genome).</div>
-        <div class="tier-info" style="margin-top:4px;opacity:0.65;font-size:0.78rem;">* Tier B+ live inference is not available in this demo. The paper's cached ρ<sub>nc</sub> = 0.543 predictions are served from <code>/lookup_gene</code>.</div>
       </div>
 
       <div class="button-row">
         <button type="submit" class="submit-btn" id="submit-btn">Run prediction</button>
-        <button type="button" class="submit-btn submit-btn-secondary" id="compare-btn" title="Fires Tier A, B, C, and D in parallel and shows the tier ladder.">Compare tiers A, B, C, D</button>
-        <button type="button" class="submit-btn submit-btn-secondary" id="prewarm-btn" title="Fires one small request to each GPU tier to wake the Modal containers before you submit. Optional — use it when you know you're about to run and want to avoid cold-start waits." style="max-width:140px;">🔥 Pre-warm</button>
+        <button type="button" class="submit-btn submit-btn-secondary" id="compare-btn" title="Fires Tier A and Tier D in parallel and shows what genome + operon context adds on top of protein-only.">Compare Tier A vs Tier D</button>
+        <button type="button" class="submit-btn submit-btn-secondary" id="prewarm-btn" title="Fires one small request at the Tier D GPU container to wake it before you submit. Optional — use it when you know you're about to run and want to avoid cold-start waits." style="max-width:140px;">🔥 Pre-warm</button>
       </div>
       <div id="stale-results-warn" class="stale-results-warn" style="display:none;">
         ⚠ The results below are for your <em>previous</em> submission. Click <strong>Run prediction</strong> (or <strong>Compare tiers</strong>) to recompute for the sequence currently in the form.
@@ -1679,8 +1666,7 @@ h1, h2, h3, h4 {
 
   <p class="compute-footnote" style="max-width:760px;">
     <strong>Reproducibility.</strong> The paper's 244,002 held-out 5-fold CV
-    predictions are available via <code>POST /lookup_gene</code> and the Zenodo
-    archive (<a href="https://doi.org/10.5281/zenodo.19639621" style="color:var(--primary-gold);">10.5281/zenodo.19639621</a>).
+    predictions are on Zenodo (<a href="https://doi.org/10.5281/zenodo.19639621" style="color:var(--primary-gold);">10.5281/zenodo.19639621</a>).
     To reproduce the headline per-fold Spearman ρ_nm = 0.590 ± 0.012 (Tier D)
     against the full corpus, run the
     <a href="https://colab.research.google.com/github/aikium-public/aiki-xp/blob/main/notebooks/aiki_xp_colab_quickstart.ipynb" style="color:var(--primary-gold);">Colab quickstart notebook</a>
@@ -1776,21 +1762,12 @@ h1, h2, h3, h4 {
 <script>
 /* =========================== ENDPOINTS =========================== */
 const TIER_A_URL     = 'https://aikium--aikixp-tier-a-predict-fasta.modal.run';
-const TIER_B_URL     = 'https://aikium--aikixp-tier-d-predict-tier-b-endpoint.modal.run';
-const TIER_B_PLUS_URL = 'https://aikium--aikixp-tier-d-predict-tier-b-plus-endpoint.modal.run';
-const TIER_C_URL     = 'https://aikium--aikixp-tier-d-predict-tier-c-endpoint.modal.run';
 const TIER_D_URL     = 'https://aikium--aikixp-tier-d-predict-tier-d-endpoint.modal.run';
 const CDS_FOR_PROTEIN_URL = 'https://aikium--aikixp-tier-a-cds-for-protein.modal.run';
 
 const TIER_META = {
   A:    { url: TIER_A_URL, needs: ['protein'],
           desc: 'Tier A: protein sequence only (ESM-C + ProtT5). No CDS or host needed. ~5 s warm, ~50 s cold.' },
-  B:    { url: TIER_B_URL, needs: ['protein','cds','host'],
-          desc: 'Tier B: ESM-C + CDS-derived biophysical features (codon, protein properties, disorder). ~10 s warm, ~50 s cold.' },
-  'B+': { url: TIER_B_PLUS_URL, needs: ['protein','cds','host'],
-          desc: 'Tier B+: adds an Evo-2 7B encoding of the 60-nt window around ATG (35 nt upstream + 25 nt downstream), plus RNA-init thermodynamics. ~15 s warm, ~90 s cold.' },
-  C:    { url: TIER_C_URL, needs: ['protein','cds','host'],
-          desc: 'Tier C: adds an Evo-2 7B encoding of the full operon DNA. ~15 s warm, ~90 s cold.' },
   D:    { url: TIER_D_URL, needs: ['protein','cds','host'],
           desc: 'Tier D (XP5): all five modalities including Bacformer-large genome context. The paper\'s headline configuration. ~20 s warm, ~90 s cold.' },
 };
@@ -1807,13 +1784,13 @@ const EXAMPLES = {
     cds: "",
     host: "NC_000913.3", mode: "heterologous", tier: "A",
   },
-  // Protein + CDS on the default host, heterologous — uses Tier B.
-  // Good demo of pairing a standalone CDS with a host without needing to
-  // match the host's genome exactly.
+  // Protein + CDS on the default host, heterologous Tier D — demonstrates
+  // pairing a standalone CDS with a host without needing the CDS to match
+  // anything in the host genome. Tier D wraps the user's CDS in lacZ context.
   protein_cds: {
     protein: "MSNLTYLQGYPEQLLSQVRTLINEQRLGDVLAKRYPGTHDYATDKALWQYTQDLKNQFLRNAPPINKVMYDNKIHVLKNALGLHTAVSRVQGGKLKAKVEIRVATVFRNAPEPFLRMIVVHELAHLKEKEHNKAFYQLCCHMEPQYHQLEFDTRLWLTQLSLGQNKI",
     cds: "ATGAGCAATCTTACTTATCTTCAGGGTTATCCCGAGCAGCTACTTTCCCAGGTGCGAACACTGATTAACGAACAGCGTCTGGGCGATGTGCTGGCAAAACGCTATCCGGGAACACACGACTACGCCACCGATAAAGCCCTCTGGCAATATACTCAGGATCTGAAAAATCAGTTTCTGCGTAATGCCCCGCCGATCAATAAAGTGATGTATGACAATAAGATCCATGTGCTAAAAAACGCGCTCGGGTTACATACCGCTGTTTCTCGTGTGCAGGGCGGCAAGCTGAAAGCAAAGGTGGAGATCCGCGTCGCTACCGTGTTTCGCAACGCGCCGGAACCGTTTTTGCGCATGATCGTGGTGCACGAGCTGGCGCACCTGAAGGAGAAAGAGCATAACAAAGCGTTTTACCAGTTGTGTTGTCATATGGAACCCCAGTACCACCAGCTTGAGTTCGACACCCGACTGTGGCTAACGCAGTTGTCGCTTGGGCAGAACAAAATCTGA",
-    host: "NC_000913.3", mode: "heterologous", tier: "B",
+    host: "NC_000913.3", mode: "heterologous", tier: "D",
   },
   // Full stack: native E. coli hybF (a well-studied hydrogenase-adjacent
   // gene). All five form fields populated, native mode, Tier D.
@@ -2806,13 +2783,17 @@ function renderScatter(userPred = null, corpusMatch = null) {
   ];
 
   if (corpusMatch) {
+    // Plot the matched gene's truth on the y=truth axis (a horizontal star
+    // at y=truth on the truth axis itself), to mark "this gene is in the
+    // corpus and here is its measured z." The user's live prediction (if any)
+    // is overlaid as a dotted horizontal line below.
     traces.push({
-      x: [corpusMatch.truth], y: [corpusMatch.tier_d_cv], mode: 'markers+text',
+      x: [corpusMatch.truth], y: [corpusMatch.truth], mode: 'markers+text',
       marker: { size: 14, symbol: 'star', color: '#22C55E', line: { width: 1.5, color: '#FAFAF8' } },
-      name: 'Matched gene (held-out CV)',
+      name: 'Matched gene (PaxDb truth)',
       text: [corpusMatch.protein_id], textposition: 'top right',
       textfont: { family: 'JetBrains Mono, monospace', size: 10, color: '#86EFAC' },
-      hovertemplate: `${corpusMatch.gene_id}<br>truth=%{x:.3f}<br>CV pred=%{y:.3f}<extra></extra>`,
+      hovertemplate: `${corpusMatch.gene_id}<br>truth=%{x:.3f}<extra></extra>`,
     });
   }
 
@@ -3182,14 +3163,12 @@ if (prewarmBtn) {
     prewarmBtn.textContent = '🔥 warming…';
     const targets = [
       ['Tier A', TIER_A_URL, { fasta: '>probe\nMKT\n' }],
-      ['Tier B', TIER_B_URL, { proteins:['MKT'], cds:['ATGAAATAA'], host:'NC_000913.3', mode:'heterologous', anchor:'lacZ' }],
-      ['Tier C', TIER_C_URL, { proteins:['MKT'], cds:['ATGAAATAA'], host:'NC_000913.3', mode:'heterologous', anchor:'lacZ' }],
       ['Tier D', TIER_D_URL, { proteins:['MKT'], cds:['ATGAAATAA'], host:'NC_000913.3', mode:'heterologous', anchor:'lacZ' }],
     ];
     const t0 = performance.now();
     const report = document.createElement('div');
     report.style.cssText = 'grid-column:1/-1;margin-top:6px;font-size:0.82rem;color:var(--champagne);opacity:0.85;';
-    report.textContent = 'Pre-warming: fired probes at Tier A/B/C/D… they\'ll stay warm ~5 min after last request.';
+    report.textContent = 'Pre-warming: fired probes at Tier A and Tier D… containers stay warm ~5 min after last request.';
     prewarmBtn.parentElement.parentElement.insertBefore(report, prewarmBtn.parentElement.nextSibling);
     await Promise.allSettled(targets.map(([name, url, body]) =>
       fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -3291,7 +3270,9 @@ form.addEventListener('submit', async (e) => {
     const tbody = document.getElementById('results-tbody');
     tbody.innerHTML = '';
 
-    // Prepend a row showing corpus-match ground truth + held-out CV prediction
+    // Prepend a row showing measured ground truth for the matched corpus gene.
+    // The paper's per-tier cached predictions for this gene live on Zenodo
+    // (10.5281/zenodo.19639621) — we don't mirror them here.
     if (matched) {
       const trRow = document.createElement('tr');
       trRow.className = 'corpus-row';
@@ -3299,16 +3280,8 @@ form.addEventListener('submit', async (e) => {
         `<td>${corpusMatch.gene_id.split('|').pop()} <span class="corpus-badge">PaxDb truth</span></td>
          <td class="${scoreClass(corpusMatch.truth)}">${corpusMatch.truth >= 0 ? '+' : ''}${corpusMatch.truth.toFixed(3)}</td>
          <td></td>
-         <td>Measured abundance in the paper's training atlas</td>`;
+         <td>Measured abundance in the paper's training atlas (fold ${corpusMatch.cv_fold}, ${corpusMatch.is_mega ? 'mega' : 'non-mega'})</td>`;
       tbody.appendChild(trRow);
-      const cvRow = document.createElement('tr');
-      cvRow.className = 'corpus-row';
-      cvRow.innerHTML =
-        `<td>${corpusMatch.gene_id.split('|').pop()} <span class="corpus-badge">held-out CV</span></td>
-         <td class="${scoreClass(corpusMatch.tier_d_cv)}">${corpusMatch.tier_d_cv >= 0 ? '+' : ''}${corpusMatch.tier_d_cv.toFixed(3)}</td>
-         <td></td>
-         <td>Paper's Tier D prediction (fold ${corpusMatch.cv_fold}, ${corpusMatch.is_mega ? 'mega' : 'non-mega'})</td>`;
-      tbody.appendChild(cvRow);
     }
 
     data.predictions.forEach((p, i) => {
@@ -3388,28 +3361,16 @@ const tierComparePanel = document.getElementById('tier-compare-panel');
 const tierCompareTbody = document.getElementById('tier-compare-tbody');
 const tierCompareNarrative = document.getElementById('tier-compare-narrative');
 
-// Tier B+ live inference is not available in this demo; cached paper
-// predictions remain accessible via /lookup_gene.
+// Live inference covers Tier A (CPU, protein-only) and Tier D (the paper's
+// XP5 champion, GPU). Intermediate tiers from the paper are scientific
+// control conditions and are served from the Zenodo deposit.
 const TIER_COMPARE_META = {
   A:      { url: TIER_A_URL,      label: 'Tier A',  mods: 'ESM-C + ProtT5',
             stages: [
               { after: 0,  msg: 'encoding ESM-C + ProtT5 (CPU)…' },
               { after: 8,  msg: 'fusion head — almost there…' },
             ] },
-  B:      { url: TIER_B_URL,      label: 'Tier B',  mods: '+ HyenaDNA + classical codon/protein/disorder',
-            stages: [
-              { after: 0,  msg: 'container cold-start or warm routing…' },
-              { after: 6,  msg: 'loading HyenaDNA + classical features on GPU…' },
-              { after: 30, msg: 'GPU running — fusion in progress…' },
-            ] },
-  C:      { url: TIER_C_URL,      label: 'Tier C',  mods: '+ Evo-2 7B full operon',
-            stages: [
-              { after: 0,  msg: 'container cold-start or warm routing…' },
-              { after: 8,  msg: 'loading Evo-2 7B (14 GB) into A100 VRAM…' },
-              { after: 45, msg: 'Evo-2 loaded — encoding full-operon window…' },
-              { after: 90, msg: 'still warming — Evo-2 cold-start can take 90-120 s…' },
-            ] },
-  D:      { url: TIER_D_URL,      label: 'Tier D',  mods: '+ Bacformer-large + operon structure (5 modalities — paper champion)',
+  D:      { url: TIER_D_URL,      label: 'Tier D',  mods: '+ DNA + classical biophysics + operon + Bacformer-large genome (5 modalities — paper champion)',
             stages: [
               { after: 0,   msg: 'container cold-start or warm routing…' },
               { after: 8,   msg: 'loading Evo-2 7B + Bacformer-large on A100…' },
@@ -3417,7 +3378,7 @@ const TIER_COMPARE_META = {
               { after: 120, msg: 'still warming — first Tier D on a cold host takes 2-3 min…' },
             ] },
 };
-const TIER_COMPARE_ORDER = ['A', 'B', 'C', 'D'];
+const TIER_COMPARE_ORDER = ['A', 'D'];
 
 function stageMessageFor(tier, elapsedSec) {
   const stages = TIER_COMPARE_META[tier]?.stages || [];

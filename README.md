@@ -23,7 +23,9 @@ Each tier adds a class of biological input and yields a statistically significan
 | **C** | + full operon DNA (≥100 nt up, ≥50 nt down) | 0.575 ± 0.011 | `evo2_prott5_seed42` |
 | **D** (XP5) | + host genome (Bacformer proteome context) | **0.590 ± 0.012** | `balanced_nonmega_5mod` |
 
-See `configs/deployment_tiers.yaml` for full recipe definitions.
+See `configs/deployment_tiers.yaml` for full recipe definitions. The Modal demo
+serves live inference for Tier A and Tier D; Tiers B / B+ / C are scientific
+control conditions with cached predictions on the [Zenodo deposit](https://doi.org/10.5281/zenodo.19639621).
 
 ## Quick start
 
@@ -42,7 +44,7 @@ client = Client()
 r = client.predict_tier_a("MKTVRQERLKSIVRILERSK...")
 print(r["predictions"][0]["predicted_expression"])
 
-# Tier D (GPU, 9 modalities)
+# Tier D (GPU, 5 modalities — paper champion)
 r = client.predict_tier_d(protein="MKT...", cds="ATG...TAA", host="NC_000913.3", mode="native")
 
 # Look up any gene in the 244K held-out CV corpus
@@ -211,23 +213,21 @@ Dockerfile.full            # Raw FASTA -> foundation-model extraction -> predict
 
 ## Public live endpoints
 
-All hosted on Modal, scale-to-zero.
+The Modal demo serves live inference for Tier A (CPU) and Tier D (GPU, the
+paper's XP5 champion). Intermediate-tier (B / B+ / C) cached predictions for
+every gene in the 492K corpus live in the Zenodo deposit, not as live endpoints.
 
 | Endpoint | Purpose |
 |---|---|
 | `https://aikium--aikixp-tier-a-landing-page.modal.run` | Landing page + static assets |
-| `POST .../lookup_gene` | Held-out CV predictions for any of 244K test-split genes (the paper-reproduction interface) |
-| `POST .../species_scatter` | Per-species calibration data (truth vs held-out CV) |
-| `POST .../find_in_corpus` | Match user protein against host genome + lookup |
-| `POST .../sample_lookup` | Random sample from the 244K lookup (for the reproduce-paper-numbers flow) |
+| `POST .../species_scatter` | Per-species calibration data (truth vs paper held-out CV) |
+| `POST .../find_in_corpus` | Membership check: is this protein in the 492K corpus? |
+| `POST .../sample_lookup` | Random sample from the 244K held-out CV predictions |
 | `POST .../cds_for_protein` | Auto-fill CDS from protein + host (native match or codon-optimized) |
 | `POST .../request_genome` | Fetch + cache a new NCBI chromosome accession on demand |
 | `GET  .../genome_status?acc=` | Poll cache / Bacformer-precompute progress for a requested accession |
-| `POST .../predict_fasta` | Tier A end-to-end (CPU) |
-| `POST https://aikium--aikixp-tier-d-predict-tier-b-endpoint.modal.run` | Tier B (GPU) |
-| `POST https://aikium--aikixp-tier-d-predict-tier-b-plus-endpoint.modal.run` | Tier B+ (GPU) |
-| `POST https://aikium--aikixp-tier-d-predict-tier-c-endpoint.modal.run` | Tier C (GPU) |
-| `POST https://aikium--aikixp-tier-d-predict-tier-d-endpoint.modal.run` | Tier D XP5 (GPU, all 9 feature blocks) |
+| `POST https://aikium--aikixp-tier-a-predict-fasta.modal.run` | Tier A end-to-end (CPU) |
+| `POST https://aikium--aikixp-tier-d-predict-tier-d-endpoint.modal.run` | Tier D XP5 (GPU, paper champion) |
 
 ## Sequence normalization for tagged proteins
 
@@ -243,23 +243,13 @@ clean_seq, changes = normalize_sequence(
 
 This strips common His, HiBit, FLAG, and other affinity tags before scoring.
 
-## Tier B+ on Modal — live inference unavailable
-
-Tier B+ uses Evo-2 1B init-window embeddings; Evo-2 1B requires NVIDIA
-Transformer Engine, which the current Modal deployment image does not
-include. The paper's Tier B+ number (ρ_nc = 0.543) is available via
-`/lookup_gene` (cached held-out CV predictions for the 492K corpus).
-For live Tier B+ inference on novel proteins, use the Docker image
-`ghcr.io/aikium-public/aiki-xp:full` on a Transformer-Engine-capable host.
-Tiers A, B, C, D on Modal are unaffected.
-
 ## Troubleshooting & FAQ
 
-**My first Tier C/D request took ~90 seconds. Is it broken?** No — Modal containers scale to zero after ~5 minutes of idle, so the first request after a quiet period cold-starts the GPU image (Evo-2 7B, Bacformer-large, ProtT5, ESM-C, HyenaDNA all load into VRAM). Subsequent requests within the idle window return in 10–20 s.
+**My first Tier D request took ~90 seconds. Is it broken?** No — the Modal GPU container scales to zero after ~5 minutes of idle, so the first request after a quiet period cold-starts the image (Evo-2 7B, Bacformer-large, ProtT5, ESM-C, HyenaDNA all load into VRAM). Subsequent requests within the idle window return in 10–20 s.
 
-**My host organism isn't in the 4,566-genome cache.** The landing page's host selector shows a "Request this genome" link when your query returns no match — paste a chromosome-level NCBI accession (e.g. `NC_000913.3`, `NZ_CP007039.1`, `CP158060.1`), and the backend fetches it from NCBI in ~30 seconds, validates it has ≥100 annotated CDS, and adds it to the typeahead. Tier A/B/C/D work immediately; Tier D's Bacformer context computes lazily on the first request (5–30 min) unless you check "pre-compute Bacformer cache" at request time. Assembly-level `GCF_*`/`GCA_*` accessions are rejected for now — paste the primary replicon's accession instead. If that still doesn't cover your case, email [venkatesh@aikium.com](mailto:venkatesh@aikium.com).
+**My host organism isn't in the 4,566-genome cache.** The landing page's host selector shows a "Request this genome" link when your query returns no match — paste a chromosome-level NCBI accession (e.g. `NC_000913.3`, `NZ_CP007039.1`, `CP158060.1`), and the backend fetches it from NCBI in ~30 seconds, validates it has ≥100 annotated CDS, and adds it to the typeahead. Tier A and Tier D work immediately on the new host; Tier D's Bacformer context computes lazily on the first request (5–30 min) unless you check "pre-compute Bacformer cache" at request time. Assembly-level `GCF_*`/`GCA_*` accessions are rejected for now — paste the primary replicon's accession instead. If that still doesn't cover your case, email [venkatesh@aikium.com](mailto:venkatesh@aikium.com).
 
-**My live Tier D prediction differs from the paper's held-out CV prediction for the same gene.** Three things to check. (1) The live endpoint re-extracts all 9 modalities from scratch using the host and anchor you specify; the CV prediction was computed once against the production genome/operon context. (2) The CV prediction is from the one fold that held the gene out — the model never saw it during training. The live prediction uses the full ensemble trained on all folds, so it has a different bias. (3) The held-out CV is the number the paper reports; the live endpoint is what you'd use for proteins not already in the corpus. Small differences (|Δz| < 0.3) are expected.
+**My live Tier D prediction differs from the paper's held-out CV prediction for the same gene.** Three things to check. (1) The live endpoint re-extracts all 5 modalities from scratch using the host and anchor you specify; the CV prediction was computed once against the production genome/operon context. (2) The CV prediction is from the one fold that held the gene out — the model never saw it during training. The live prediction uses the full ensemble trained on all folds, so it has a different bias. (3) The held-out CV is the number the paper reports; the live endpoint is what you'd use for proteins not already in the corpus. Small differences (|Δz| < 0.3) are expected.
 
 **Can I batch-predict 10,000 sequences?** Yes — use the Docker image (`ghcr.io/aikium-public/aiki-xp:inference`) or the pip install path for bulk inference. The Modal demo is sized for interactive use (a few predictions at a time) and has per-user rate limits to keep GPU costs bounded.
 
