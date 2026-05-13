@@ -1,0 +1,53 @@
+name: Request a new host genome
+description: Your organism isn't in the 1,831-genome cache. Ask us to add it.
+labels: ["host-request", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Aiki-XP ships with 1,831 pre-cached bacterial reference genomes. If your host
+        isn't one of them, submit the NCBI accession below and we'll download, validate,
+        and cache it on our Modal volume. Typical turnaround: same day for bacterial
+        chromosome-level accessions.
+
+        **Please don't request**: eukaryotic genomes (not supported), genomes larger
+        than 15 MB (out-of-distribution), or partial/WGS contigs that aren't assembled
+        into a single chromosome.
+
+  - type: input
+    id: accession
+    attributes:
+      label: NCBI assembly or chromosome accession
+      description: Preferably RefSeq (NC_*, NZ_*) or GenBank (CP_*, CM_*). Include the version suffix.
+      placeholder: "e.g. NC_011978.1"
+    validations:
+      required: true
+
+  - type: input
+    id: organism
+    attributes:
+      label: Organism name
+      placeholder: "e.g. Thermotoga neapolitana DSM 4359"
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case (why do you want this organism)
+      description: >
+        One sentence is fine — just helps us prioritise. "Recombinant expression of
+        enzyme X for biomanufacturing" or "comparing to my own proteomics dataset" are
+        both perfectly valid.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirm
+      options:
+        - label: This is a bacterial genome (not eukaryotic/archaeal/viral).
+          required: true
+        - label: I've checked the 1,831-genome host list (`web/hosts.json`) and my organism isn't there.
+          required: true

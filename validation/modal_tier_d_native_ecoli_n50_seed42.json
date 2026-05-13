@@ -1,0 +1,465 @@
+{
+  "n_genes": 50,
+  "rho_truth_vs_modal": 0.7354798436656222,
+  "rho_truth_vs_cv_tier_d": 0.7421066534348737,
+  "rho_truth_vs_cv_tier_c": 0.6938942113455367,
+  "rho_modal_vs_cv": 0.9182713085234094,
+  "pearson_truth_vs_modal": 0.5437979821854698,
+  "pearson_truth_vs_cv": 0.5652865415320929,
+  "mae_truth_vs_modal": 0.5776400910504162,
+  "mae_truth_vs_cv": 0.5103978180885315,
+  "native_rate": 1.0,
+  "bacformer_rate": 1.0,
+  "rows": [
+    {
+      "protein_id": "NP_416308.4",
+      "truth": 0.2663031220436096,
+      "modal_9mod": -0.6707741022109985,
+      "precomputed_tier_d": -0.40040355920791626,
+      "precomputed_tier_c": -0.49754124879837036,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_415386.1",
+      "truth": 0.751840353012085,
+      "modal_9mod": 0.6199207305908203,
+      "precomputed_tier_d": 0.22421473264694214,
+      "precomputed_tier_c": 0.2488534152507782,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_418248.1",
+      "truth": 0.15919756889343262,
+      "modal_9mod": -0.07082722336053848,
+      "precomputed_tier_d": -0.20521046221256256,
+      "precomputed_tier_c": -0.04719628021121025,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_416159.2",
+      "truth": 0.8778529763221741,
+      "modal_9mod": -0.09950728714466095,
+      "precomputed_tier_d": 0.608086109161377,
+      "precomputed_tier_c": 0.290574848651886,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_415613.1",
+      "truth": 0.8380448222160339,
+      "modal_9mod": 0.6567574739456177,
+      "precomputed_tier_d": 1.4330828189849854,
+      "precomputed_tier_c": 1.4852654933929443,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_418773.1",
+      "truth": -0.15161359310150146,
+      "modal_9mod": -0.19755202531814575,
+      "precomputed_tier_d": -0.02893788367509842,
+      "precomputed_tier_c": -0.01954597607254982,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_415446.1",
+      "truth": 0.25926002860069275,
+      "modal_9mod": -0.1348564624786377,
+      "precomputed_tier_d": 0.022873368114233017,
+      "precomputed_tier_c": -0.09479797631502151,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_416471.1",
+      "truth": 0.13300007581710815,
+      "modal_9mod": -0.9388418197631836,
+      "precomputed_tier_d": -0.6899434924125671,
+      "precomputed_tier_c": -0.7136214971542358,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_417397.1",
+      "truth": 0.8951348662376404,
+      "modal_9mod": 0.6569133996963501,
+      "precomputed_tier_d": 0.30162250995635986,
+      "precomputed_tier_c": 0.4194245934486389,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_416082.1",
+      "truth": 0.6531473994255066,
+      "modal_9mod": -0.7177702784538269,
+      "precomputed_tier_d": -0.192964106798172,
+      "precomputed_tier_c": -0.8268238306045532,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_418117.1",
+      "truth": 0.680030882358551,
+      "modal_9mod": -0.06580636650323868,
+      "precomputed_tier_d": -0.016527991741895676,
+      "precomputed_tier_c": 0.268887996673584,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_414975.1",
+      "truth": 0.8030418157577515,
+      "modal_9mod": 0.7748150825500488,
+      "precomputed_tier_d": 1.1886311769485474,
+      "precomputed_tier_c": 1.2776590585708618,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_417953.1",
+      "truth": -0.026478705927729607,
+      "modal_9mod": -1.2204954624176025,
+      "precomputed_tier_d": -0.8680141568183899,
+      "precomputed_tier_c": -0.8979079723358154,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_416824.1",
+      "truth": -0.08583419770002365,
+      "modal_9mod": -0.5242113471031189,
+      "precomputed_tier_d": -0.04550156369805336,
+      "precomputed_tier_c": -0.43526291847229004,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_415619.1",
+      "truth": 0.8650431036949158,
+      "modal_9mod": -0.1033572182059288,
+      "precomputed_tier_d": -0.04035448282957077,
+      "precomputed_tier_c": 0.014956862665712833,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_415338.1",
+      "truth": 0.19551856815814972,
+      "modal_9mod": -0.30729684233665466,
+      "precomputed_tier_d": -0.3227899670600891,
+      "precomputed_tier_c": -0.45016804337501526,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_416196.1",
+      "truth": 0.4762159585952759,
+      "modal_9mod": 0.13333925604820251,
+      "precomputed_tier_d": 0.4210348427295685,
+      "precomputed_tier_c": -0.2094600647687912,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_416153.1",
+      "truth": 0.5457367300987244,
+      "modal_9mod": 0.2623843550682068,
+      "precomputed_tier_d": 0.33663779497146606,
+      "precomputed_tier_c": 0.6356071829795837,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_418783.2",
+      "truth": -2.912086248397827,
+      "modal_9mod": -0.5371283292770386,
+      "precomputed_tier_d": -0.6796271800994873,
+      "precomputed_tier_c": -0.6577920913696289,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_418714.1",
+      "truth": -0.550593912601471,
+      "modal_9mod": -0.8277970552444458,
+      "precomputed_tier_d": -0.896454930305481,
+      "precomputed_tier_c": -0.7940410375595093,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_417379.1",
+      "truth": 0.7981708645820618,
+      "modal_9mod": 0.9159849286079407,
+      "precomputed_tier_d": 1.0264383554458618,
+      "precomputed_tier_c": 0.6823988556861877,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_415836.1",
+      "truth": 0.03085208684206009,
+      "modal_9mod": -0.5398741364479065,
+      "precomputed_tier_d": -0.5594047904014587,
+      "precomputed_tier_c": -0.2702503502368927,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_418490.1",
+      "truth": 0.004335430450737476,
+      "modal_9mod": -0.9501932263374329,
+      "precomputed_tier_d": -0.9638485312461853,
+      "precomputed_tier_c": -0.807566225528717,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_415302.1",
+      "truth": -0.06830452382564545,
+      "modal_9mod": -0.5422044992446899,
+      "precomputed_tier_d": -0.240749791264534,
+      "precomputed_tier_c": -0.5675151944160461,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_417877.1",
+      "truth": 0.4697863757610321,
+      "modal_9mod": -0.9494583010673523,
+      "precomputed_tier_d": -0.5858612656593323,
+      "precomputed_tier_c": -0.5226498246192932,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_416222.1",
+      "truth": -0.35373932123184204,
+      "modal_9mod": -0.6460631489753723,
+      "precomputed_tier_d": -0.5424383282661438,
+      "precomputed_tier_c": -0.25194570422172546,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_417088.1",
+      "truth": 1.0584152936935425,
+      "modal_9mod": 0.9435944557189941,
+      "precomputed_tier_d": 1.321017861366272,
+      "precomputed_tier_c": 1.9498785734176636,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_416558.1",
+      "truth": -0.07772016525268555,
+      "modal_9mod": -0.641666829586029,
+      "precomputed_tier_d": -0.12448856234550476,
+      "precomputed_tier_c": -0.3971272110939026,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_418772.4",
+      "truth": 0.48776569962501526,
+      "modal_9mod": -0.10126428306102753,
+      "precomputed_tier_d": -0.031120937317609787,
+      "precomputed_tier_c": -0.23644718527793884,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_417976.1",
+      "truth": -0.05016486346721649,
+      "modal_9mod": -0.4171241223812103,
+      "precomputed_tier_d": -0.0030164653435349464,
+      "precomputed_tier_c": 0.19051076471805573,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_418591.1",
+      "truth": 0.19534368813037872,
+      "modal_9mod": 0.12439237534999847,
+      "precomputed_tier_d": 0.00421401672065258,
+      "precomputed_tier_c": 0.26098015904426575,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_415202.1",
+      "truth": 0.5376226902008057,
+      "modal_9mod": 0.02138977311551571,
+      "precomputed_tier_d": 0.18689242005348206,
+      "precomputed_tier_c": 0.476814329624176,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_418608.6",
+      "truth": 0.33749234676361084,
+      "modal_9mod": -0.5291711091995239,
+      "precomputed_tier_d": -0.39989620447158813,
+      "precomputed_tier_c": -0.6451612710952759,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_418136.2",
+      "truth": -0.006861367262899876,
+      "modal_9mod": -0.958221435546875,
+      "precomputed_tier_d": -0.8104783892631531,
+      "precomputed_tier_c": -0.7074052095413208,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_416248.1",
+      "truth": -0.05166718363761902,
+      "modal_9mod": -0.22335919737815857,
+      "precomputed_tier_d": -0.03299875557422638,
+      "precomputed_tier_c": -0.02089044079184532,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_415358.1",
+      "truth": -0.27068132162094116,
+      "modal_9mod": 0.04763951152563095,
+      "precomputed_tier_d": -0.11043248325586319,
+      "precomputed_tier_c": 0.0038786381483078003,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_416640.2",
+      "truth": -0.6045963764190674,
+      "modal_9mod": -1.0540134906768799,
+      "precomputed_tier_d": -0.997308075428009,
+      "precomputed_tier_c": -0.7300968170166016,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_414984.1",
+      "truth": 0.7340334057807922,
+      "modal_9mod": 0.1048118844628334,
+      "precomputed_tier_d": 0.8543087840080261,
+      "precomputed_tier_c": 0.27008429169654846,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_418665.1",
+      "truth": 1.084028720855713,
+      "modal_9mod": 0.35980212688446045,
+      "precomputed_tier_d": 0.34635165333747864,
+      "precomputed_tier_c": 0.27805259823799133,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_417648.4",
+      "truth": 0.9337923526763916,
+      "modal_9mod": 0.8521637916564941,
+      "precomputed_tier_d": 1.4137728214263916,
+      "precomputed_tier_c": 1.2803391218185425,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_416708.1",
+      "truth": -0.39201709628105164,
+      "modal_9mod": -0.9836244583129883,
+      "precomputed_tier_d": -1.025109887123108,
+      "precomputed_tier_c": -0.847048282623291,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_414882.1",
+      "truth": -2.912086248397827,
+      "modal_9mod": -0.6264541149139404,
+      "precomputed_tier_d": -0.4308890104293823,
+      "precomputed_tier_c": -0.34585365653038025,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "YP_026270.1",
+      "truth": 0.5969781875610352,
+      "modal_9mod": 0.1408793032169342,
+      "precomputed_tier_d": 0.4607585370540619,
+      "precomputed_tier_c": 0.1563376486301422,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_414645.1",
+      "truth": 0.10999767482280731,
+      "modal_9mod": -0.3815944790840149,
+      "precomputed_tier_d": -0.0803287923336029,
+      "precomputed_tier_c": -0.4037958085536957,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_416617.1",
+      "truth": 0.8544014096260071,
+      "modal_9mod": 0.6426181197166443,
+      "precomputed_tier_d": 0.6743808388710022,
+      "precomputed_tier_c": 0.6659533977508545,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_416728.1",
+      "truth": -0.3001224994659424,
+      "modal_9mod": -0.31343793869018555,
+      "precomputed_tier_d": -0.14610715210437775,
+      "precomputed_tier_c": -0.20002813637256622,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_415520.1",
+      "truth": 0.8141893148422241,
+      "modal_9mod": 0.2649756669998169,
+      "precomputed_tier_d": -0.08904120326042175,
+      "precomputed_tier_c": 0.2893619239330292,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_415026.1",
+      "truth": 0.4715022146701813,
+      "modal_9mod": 0.14694944024085999,
+      "precomputed_tier_d": 0.2952360510826111,
+      "precomputed_tier_c": 0.2393966019153595,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_416571.1",
+      "truth": -0.013953729532659054,
+      "modal_9mod": -0.9736132621765137,
+      "precomputed_tier_d": -1.0872160196304321,
+      "precomputed_tier_c": -0.8843176364898682,
+      "operon_source": "native",
+      "bacformer_available": true
+    },
+    {
+      "protein_id": "NP_415290.1",
+      "truth": -0.6976922154426575,
+      "modal_9mod": -0.6769204139709473,
+      "precomputed_tier_d": -0.45226356387138367,
+      "precomputed_tier_c": -0.33156973123550415,
+      "operon_source": "native",
+      "bacformer_available": true
+    }
+  ]
+}

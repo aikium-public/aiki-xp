@@ -1,0 +1,36 @@
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+
+*.pt
+*.ckpt
+*.parquet
+
+.env
+*.json.bak
+
+.vscode/
+.idea/
+*.swp
+*~
+
+.DS_Store
+Thumbs.db
+
+# Built data (hosted on Zenodo, not GitHub)
+data/*.parquet
+data/*.csv
+
+zenodo_staging/
+
+# Modal-deployment source (lives in the private binding_model tree;
+# hosted demo at aikium--aikixp-tier-a-landing-page.modal.run is
+# unaffected by this exclusion — see DATA_SOURCES.md / Zenodo deposit
+# for reproducibility).
+modal_app.py
+modal_tier_d_app.py
+web/
